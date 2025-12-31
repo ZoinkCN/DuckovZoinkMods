@@ -3,6 +3,7 @@ using Duckov.Modding;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
+namespace MiniMap.Api;
 public static class ModSettingAPI {
     private const string ADD_DROP_DOWN_LIST = "AddDropDownList";
     private const string ADD_SLIDER = "AddSlider";
@@ -55,7 +56,7 @@ public static class ModSettingAPI {
     public static bool Init(ModInfo modInfo) {
         if (IsInit) return true;
         if (modInfo.name == MOD_NAME) {
-            Debug.LogError("[MiniMap] 初始化失败，不能使用ModSetting的info进行初始化");
+            Debug.LogError($"[{ModBehaviour.MOD_NAME}] 初始化失败，不能使用ModSetting的info进行初始化");
             return false;
         }
         ModSettingAPI.modInfo = modInfo;
@@ -67,7 +68,7 @@ public static class ModSettingAPI {
                 .Where(m => m.Name == methodName)
                 .ToArray();
             if (methodInfos.Length == 0) {
-                Debug.LogError($"[MiniMap] {methodName}方法找不到");
+                Debug.LogError($"[{ModBehaviour.MOD_NAME}] {methodName}方法找不到");
                 return false;
             }
         }
@@ -359,7 +360,7 @@ public static class ModSettingAPI {
         if (versionField != null && versionField.FieldType == typeof(float)) {
             Version modSettingVersion = (Version)versionField.GetValue(null);
             if (modSettingVersion!=VERSION) {
-                Debug.LogWarning($"[MiniMap] 警告:ModSetting的版本:{modSettingVersion} (API的版本:{VERSION}),新功能将无法使用");
+                Debug.LogWarning($"[{ModBehaviour.MOD_NAME}] 警告:ModSetting的版本:{modSettingVersion} (API的版本:{VERSION}),新功能将无法使用");
                 return false;
             }
             return true;
@@ -372,14 +373,14 @@ public static class ModSettingAPI {
         Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
         foreach (Assembly assembly in assemblies) {
             if (assembly.FullName.Contains(MOD_NAME)) {
-                Debug.Log($"[MiniMap] 找到{MOD_NAME}相关程序集: {assembly.FullName}");
+                Debug.Log($"[{ModBehaviour.MOD_NAME}] 找到{MOD_NAME}相关程序集: {assembly.FullName}");
             }
 
             Type type = assembly.GetType(typeName);
             if (type != null) return type;
         }
 
-        Debug.Log("[MiniMap] 找不到程序集");
+        Debug.Log($"[{ModBehaviour.MOD_NAME}] 找不到程序集");
         return null;
     }
 
@@ -431,7 +432,7 @@ public static class ModSettingAPI {
             methodCache[cacheKey].DynamicInvoke(parameters);
             return true;
         } catch (Exception ex) {
-            Debug.LogError($"[MiniMap] 委托调用{methodName}失败: {ex.Message}");
+            Debug.LogError($"[{ModBehaviour.MOD_NAME}] 委托调用{methodName}失败: {ex.Message}");
             return false;
         }
     }

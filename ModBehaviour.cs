@@ -1,11 +1,10 @@
 ﻿using HarmonyLib;
 using System.Reflection;
-using Duckov.MiniMaps;
-using Duckov.MiniMaps.UI;
 using UnityEngine;
 using Duckov.Modding;
-using MiniMap.Extenders;
+using MiniMap.Patchers;
 using MiniMap.Managers;
+using MiniMap.Utils;
 
 namespace MiniMap
 {
@@ -16,77 +15,113 @@ namespace MiniMap
 
         public static string MOD_NAME = "MiniMap";
 
-        Harmony harmony = new Harmony(MOD_ID);
+        public Harmony Harmony = new Harmony(MOD_ID);
         public static ModBehaviour? Instance;
 
+        private List<PatcherBase> patchers = new List<PatcherBase>() {
+            CharacterSpawnerRootPatcher.Instance,
+            CharacterMainControlPatcher.Instance,
+            PointOfInterestEntryPatcher.Instance,
+            MiniMapCompassPatcher.Instance,
+            MiniMapDisplayPatcher.Instance,
+        };
 
-        void PatchSingleExtender(Type extenderType, Type ExtenderType, string methodName, BindingFlags bindFlags = BindingFlags.Instance | BindingFlags.Public)
+        public bool PatchSingleExtender(Type targetType, Type extenderType, string methodName, BindingFlags bindFlags = BindingFlags.Instance | BindingFlags.Public)
         {
-            MethodInfo originMethod = extenderType.GetMethod(methodName, bindFlags);
-            MethodInfo prefix = ExtenderType.GetMethod("Prefix", BindingFlags.Static | BindingFlags.Public);
-            MethodInfo postfix = ExtenderType.GetMethod("Postfix", BindingFlags.Static | BindingFlags.Public);
-            MethodInfo transpiler = ExtenderType.GetMethod("Transpiler", BindingFlags.Static | BindingFlags.Public);
-            MethodInfo finalizer = ExtenderType.GetMethod("Finalizer", BindingFlags.Static | BindingFlags.Public);
-            harmony.Patch(
-                originMethod,
-                prefix == null ? null : new HarmonyMethod(prefix),
-                postfix == null ? null : new HarmonyMethod(postfix),
-                transpiler == null ? null : new HarmonyMethod(transpiler),
-                finalizer == null ? null : new HarmonyMethod(finalizer)
-            );
+            MethodInfo originMethod = targetType.GetMethod(methodName, bindFlags);
+            if (originMethod == null)
+            {
+                Debug.LogWarning($"[{MOD_NAME}] Original method not found: {targetType.Name}.{methodName}");
+                return false;
+            }
+
+            try
+            {
+                MethodInfo prefix = extenderType.GetMethod("Prefix", BindingFlags.Static | BindingFlags.Public);
+                MethodInfo postfix = extenderType.GetMethod("Postfix", BindingFlags.Static | BindingFlags.Public);
+                MethodInfo transpiler = extenderType.GetMethod("Transpiler", BindingFlags.Static | BindingFlags.Public);
+                MethodInfo finalizer = extenderType.GetMethod("Finalizer", BindingFlags.Static | BindingFlags.Public);
+                Harmony.Unpatch(originMethod, HarmonyPatchType.All, Harmony.Id);
+                Harmony.Patch(
+                    originMethod,
+                    prefix != null ? new HarmonyMethod(prefix) : null,
+                    postfix != null ? new HarmonyMethod(postfix) : null,
+                    transpiler != null ? new HarmonyMethod(transpiler) : null,
+                    finalizer != null ? new HarmonyMethod(finalizer) : null
+                );
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"[{MOD_NAME}] Failed to patch {originMethod}: {ex.Message}");
+                return false;
+            }
         }
 
-        void UnpatchSingleExtender(Type extenderType, string methodName, BindingFlags bindFlags = BindingFlags.Instance | BindingFlags.Public)
+        //public bool PatchSingleExtender(string assembliyName, string targetTypeName, Type extenderType, string methodName, BindingFlags bindFlags = BindingFlags.Instance | BindingFlags.Public)
+        //{
+        //    Type? targetType = AssemblyControl.FindTypeInAssemblies(assembliyName, targetTypeName);
+        //    if (targetType == null)
+        //    {
+        //        Debug.LogWarning($"[{MOD_NAME}] Target Type \"{targetTypeName}\" Not Found!");
+        //        return false;
+        //    }
+        //    return PatchSingleExtender(targetType, extenderType, methodName, bindFlags);
+        //}
+
+        //public void UnpatchSingleExtender(Type targetType, string methodName, BindingFlags bindFlags = BindingFlags.Instance | BindingFlags.Public)
+        //{
+        //    MethodInfo originMethod = targetType.GetMethod(methodName, bindFlags);
+        //    Harmony.Unpatch(originMethod, HarmonyPatchType.All, MOD_ID);
+        //}
+
+        public bool UnpatchSingleExtender(string assembliyName, string targetTypeName, string methodName, BindingFlags bindFlags = BindingFlags.Instance | BindingFlags.Public)
         {
-            MethodInfo originMethod = extenderType.GetMethod(methodName, bindFlags);
-            harmony.Unpatch(originMethod, HarmonyPatchType.All, MOD_ID);
+            Type? targetType = AssemblyControl.FindTypeInAssemblies(assembliyName, targetTypeName);
+            if (targetType == null)
+            {
+                Debug.LogWarning($"[{MOD_NAME}] Target Type \"{targetTypeName}\" Not Found!");
+                return false;
+            }
+            MethodInfo originMethod = targetType.GetMethod(methodName, bindFlags);
+            Harmony.Unpatch(originMethod, HarmonyPatchType.All, MOD_ID);
+            return true;
         }
 
         void ApplyHarmonyExtenders()
         {
             try
             {
-                #region MiniMap
-                PatchSingleExtender(typeof(MiniMapCompass), typeof(MiniMapCompassSetupRotationExtender), "SetupRotation", BindingFlags.Instance | BindingFlags.NonPublic);
-                PatchSingleExtender(typeof(MiniMapDisplay), typeof(MiniMapDisplaySetupRotationExtender), "SetupRotation", BindingFlags.Instance | BindingFlags.NonPublic);
-                #endregion
-                #region Character POI
-                PatchSingleExtender(typeof(PointOfInterestEntry), typeof(PointOfInterestEntryUpdateExtender), "Update", BindingFlags.Instance | BindingFlags.NonPublic);
-                PatchSingleExtender(typeof(PointOfInterestEntry), typeof(PointOfInterestEntryUpdateRotationExtender), "UpdateRotation", BindingFlags.Instance | BindingFlags.NonPublic);
-                PatchSingleExtender(typeof(CharacterSpawnerRoot), typeof(CharacterSpawnerRootAddCharacterExtender), "AddCreatedCharacter");
-                PatchSingleExtender(typeof(CharacterMainControl), typeof(CharacterMainControlUpdateExtender), "Update", BindingFlags.Instance | BindingFlags.NonPublic);
-                #endregion
+                Debug.Log($"[{ModBehaviour.MOD_NAME}] Patching Patchers");
+                foreach(var patcher in patchers)
+                {
+                    patcher.Patch();
+                }
             }
             catch (Exception e)
             {
-                Debug.LogError($"[MiniMap] 应用扩展器失败: {e}");
+                Debug.LogError($"[{ModBehaviour.MOD_NAME}] 应用扩展器失败: {e}");
             }
         }
         void CancelHarmonyExtender()
         {
             try
             {
-                #region MiniMap
-                UnpatchSingleExtender(typeof(MiniMapCompass), "SetupRotation", BindingFlags.Instance | BindingFlags.NonPublic);
-                UnpatchSingleExtender(typeof(MiniMapDisplay), "SetupRotation", BindingFlags.Instance | BindingFlags.NonPublic);
-                #endregion
-                #region Character POI
-                UnpatchSingleExtender(typeof(PointOfInterestEntry), "Update", BindingFlags.Instance | BindingFlags.NonPublic);
-                UnpatchSingleExtender(typeof(PointOfInterestEntry), "UpdateRotation", BindingFlags.Instance | BindingFlags.NonPublic);
-                UnpatchSingleExtender(typeof(CharacterSpawnerRoot), "AddCreatedCharacter");
-                UnpatchSingleExtender(typeof(CharacterMainControl), "Update", BindingFlags.Instance | BindingFlags.NonPublic);
-                #endregion
+                foreach (var patcher in patchers)
+                {
+                    patcher.Unpatch();
+                }
             }
             catch (Exception e)
             {
-                Debug.LogError($"[MiniMap] 取消扩展器失败: {e}");
+                Debug.LogError($"[{ModBehaviour.MOD_NAME}] 取消扩展器失败: {e}");
             }
         }
         void Awake()
         {
             if (Instance != null)
             {
-                Debug.LogError("[MiniMap] ModBehaviour 已实例化");
+                Debug.LogError($"[{ModBehaviour.MOD_NAME}] ModBehaviour 已实例化");
                 return;
             }
             Instance = this;
@@ -100,11 +135,11 @@ namespace MiniMap
                 ApplyHarmonyExtenders();
                 ModManager.OnModActivated += ModManager_OnModActivated;
                 LevelManager.OnEvacuated += OnEvacuated;
-                SceneLoader.onFinishedLoadingScene += CharacterPoiCommon.OnFinishedLoadingScene;
+                SceneLoader.onFinishedLoadingScene += PoiCommon.OnFinishedLoadingScene;
             }
             catch (Exception e)
             {
-                Debug.LogError($"[MiniMap] 启用mod失败: {e}");
+                Debug.LogError($"[{ModBehaviour.MOD_NAME}] 启用mod失败: {e}");
             }
         }
 
@@ -120,13 +155,13 @@ namespace MiniMap
                 CancelHarmonyExtender();
                 ModManager.OnModActivated -= ModManager_OnModActivated;
                 LevelManager.OnEvacuated -= OnEvacuated;
-                SceneLoader.onFinishedLoadingScene -= CharacterPoiCommon.OnFinishedLoadingScene;
+                SceneLoader.onFinishedLoadingScene -= PoiCommon.OnFinishedLoadingScene;
                 CustomMinimapManager.Destroy();
-                Debug.Log($"[MiniMap] disable mod {MOD_NAME}");
+                Debug.Log($"[{ModBehaviour.MOD_NAME}] disable mod {MOD_NAME}");
             }
             catch (Exception e)
             {
-                Debug.LogError($"[MiniMap] 禁用mod失败: {e}");
+                Debug.LogError($"[{ModBehaviour.MOD_NAME}] 禁用mod失败: {e}");
             }
         }
 
@@ -134,14 +169,14 @@ namespace MiniMap
         private void ModManager_OnModActivated(ModInfo arg1, Duckov.Modding.ModBehaviour arg2)
         {
             //(触发时机:此mod在ModSetting之前启用)检查启用的mod是否是ModSetting,是进行初始化
-            if (arg1.name != ModSettingAPI.MOD_NAME || !ModSettingAPI.Init(info)) return;
+            if (arg1.name != Api.ModSettingAPI.MOD_NAME || !Api.ModSettingAPI.Init(info)) return;
             ModSettingManager.needUpdate = true;
         }
 
         protected override void OnAfterSetup()
         {
             //(触发时机:此mod在ModSetting之后启用)此mod，Setup后,尝试进行初始化
-            if (ModSettingAPI.Init(info))
+            if (Api.ModSettingAPI.Init(info))
             {
                 ModSettingManager.needUpdate = true;
             }
@@ -158,7 +193,7 @@ namespace MiniMap
             }
             catch (Exception e)
             {
-                Debug.LogError($"[MiniMap] 更新失败: {e}");
+                Debug.LogError($"[{ModBehaviour.MOD_NAME}] 更新失败: {e}");
             }
         }
     }

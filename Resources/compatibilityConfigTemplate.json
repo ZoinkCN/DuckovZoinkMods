@@ -1,0 +1,34 @@
+{
+    "ShoulderSurfing": {
+        "descCN": "第三人称越肩视角",
+        "descEN": "Shoulder Surfing",
+        "showPlayerArrow": {
+            "type": "toggle",
+            "descCN": "显示玩家指示器",
+            "descEN": "Show Player Arrow",
+            "default": false
+        },
+        "disableMiniMap": {
+            "type": "toggle",
+            "descCN": "禁用越肩视角小地图",
+            "descEN": "Enable Shoulder Surfing Mini Map",
+            "default": true
+        }
+    },
+    "BossLiveMap": {
+        "descCN": "Boss实时地图标记",
+        "descEN": "Live Boss Map Markers",
+        "useEnemyPoi": {
+            "type": "toggle",
+            "descCN": "使用Boss实时地图标记的图标",
+            "descEN": "Use Live Boss Map Markers Icon",
+            "default": false
+        },
+        "enbleDirectionAnyway": {
+            "type": "toggle",
+            "descCN": "依然开启方向指示器",
+            "descEN": "Enble Direction Pointer Anyway",
+            "default": false
+        }
+    }
+}

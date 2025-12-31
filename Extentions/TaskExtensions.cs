@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Text;
-using Unity.VisualScripting;
+﻿using System.Collections;
 using UnityEngine;
 
 namespace MiniMap.Extentions
@@ -11,7 +7,7 @@ namespace MiniMap.Extentions
     {
         private static float s_lastTaskTime;
         private static Coroutine? s_activeRefreshCoroutine;
-        private static readonly float s_debounceDelay = 0.5f;
+        private static readonly float s_debounceDelay = 1f;
 
         /// <summary>
         /// 扩展方法：执行任务并防抖刷新

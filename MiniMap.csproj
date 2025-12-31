@@ -4,7 +4,9 @@
     <TargetFramework>netstandard2.1</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <DuckovPath>D:\SteamLibrary\steamapps\common\Escape from Duckov\Duckov_Data</DuckovPath>
+    <SteamLibrary>D:\SteamLibrary\steamapps</SteamLibrary>
+    <WorkShopPath>$(SteamLibrary)\workshop\content\3167020</WorkShopPath>
+    <DuckovPath>$(SteamLibrary)\common\Escape from Duckov\Duckov_Data</DuckovPath>
     <ManagedPath>$(DuckovPath)\Managed</ManagedPath>
     <LangVersion>10.0</LangVersion>
   </PropertyGroup>
@@ -16,7 +18,9 @@
       <HintPath>libs\0Harmony.dll</HintPath>
     </Reference>
     <Reference Include="$(DuckovPath)\Managed\Unity*" />
-    <ResourceFiles Include="Resources\**\*" />
+    <!--<Reference Include="$(WorkShopPath)\3597405574\ShoulderSurfing.dll" />-->
+    <!--<Reference Include="$(WorkShopPath)\3589079671\BossLiveMapMod.dll" />-->
+    <ResourceFiles Include="ModResources\**\*" />
     <MiniMapFiles Include="MiniMap\**\*" />
 
     <!-- 包含所有 DLL -->
@@ -30,10 +34,22 @@
     <!-- 引用非系统 DLL -->
     <Reference Include="@(AllDlls)" Exclude="@(SystemDlls)" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Copy SourceFiles="bin\Release\netstandard2.1\MiniMap.dll" DestinationFiles="$(DuckovPath)\Mods\MiniMap\MiniMap.dll" />
     <Copy SourceFiles="bin\Release\netstandard2.1\Newtonsoft.Json.dll" DestinationFiles="$(DuckovPath)\Mods\MiniMap\Newtonsoft.Json.dll" />
-    <Copy SourceFiles="libs\0Harmony.dll" DestinationFiles="$(DuckovPath)\Mods\MiniMap\0Harmony.dll" />
     <Copy SourceFiles="@(MiniMapFiles)" DestinationFolder="$(DuckovPath)\Mods\MiniMap\%(RecursiveDir)" SkipUnchangedFiles="true" />
     <Copy SourceFiles="@(ResourceFiles)" DestinationFolder="$(DuckovPath)\Mods\MiniMap\%(RecursiveDir)" SkipUnchangedFiles="true" />
   </Target>

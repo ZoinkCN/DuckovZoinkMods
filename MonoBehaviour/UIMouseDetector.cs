@@ -1,7 +1,8 @@
-﻿using Unity.VisualScripting;
+﻿using MiniMap.Managers;
+using Unity.VisualScripting;
 using UnityEngine;
 
-namespace MiniMap.Managers
+namespace MiniMap.MonoBehaviours
 {
     public class UIMouseDetector : MonoBehaviour
     {

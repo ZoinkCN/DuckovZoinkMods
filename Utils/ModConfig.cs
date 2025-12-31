@@ -1,25 +1,12 @@
-﻿using System.Reflection;
-using UnityEngine;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Newtonsoft.Json;
+using System.Reflection;
+using UnityEngine;
 
-namespace MiniMap
+namespace MiniMap.Utils
 {
-    public static class Util
+    public static class ModConfig
     {
-        public static List<T> ToList<T>(this JArray jArray)
-        {
-            List<T> result = new List<T>();
-            foreach (var item in jArray)
-            {
-                T? value = item.ToObject<T>();
-                if (value == null)
-                    throw new NullReferenceException($"Failed to convert to {typeof(T)}");
-                result.Add(value);
-            }
-            return result;
-        }
-
         public static string? DirectoryName = null;
         public static Dictionary<string, Sprite> LoadedSprites = new Dictionary<string, Sprite>();
 
@@ -45,64 +32,6 @@ namespace MiniMap
             }
             return Path.Combine(directoryName, fileName);
         }
-
-        public static Texture2D CreateCircleTexture(int radius, Color color, int padding = 0)
-        {
-            int size = radius * 2 + padding * 2;
-            Texture2D texture = new Texture2D(size, size, TextureFormat.RGBA32, false);
-            float center = size / 2f;
-
-            for (int x = 0; x < size; x++)
-            {
-                for (int y = 0; y < size; y++)
-                {
-                    float distance = Mathf.Sqrt((x - center) * (x - center) +
-                                              (y - center) * (y - center));
-
-                    if (distance <= radius)
-                    {
-                        texture.SetPixel(x, y, color);
-                    }
-                    else
-                    {
-                        texture.SetPixel(x, y, new Color(0, 0, 0, 0));
-                    }
-                }
-            }
-            texture.Apply();
-            return texture;
-        }
-
-        public static bool CreateFilledRectTransform(Transform parent, string objectName, out GameObject? gameObject, out RectTransform? rectTransform)
-        {
-            try
-            {
-                if (string.IsNullOrEmpty(objectName))
-                {
-                    objectName = "Zoink_NewGameObject";
-                }
-                if (!objectName.StartsWith("Zoink_"))
-                {
-                    objectName = "Zoink_" + objectName;
-                }
-                gameObject = new GameObject(objectName);
-                rectTransform = gameObject.AddComponent<RectTransform>();
-
-                rectTransform.SetParent(parent);
-                rectTransform.anchorMin = Vector2.zero;
-                rectTransform.anchorMax = Vector2.one;
-                rectTransform.offsetMin = Vector2.zero;
-                rectTransform.offsetMax = Vector2.zero;
-                return true;
-            }
-            catch (Exception)
-            {
-                gameObject = null;
-                rectTransform = null;
-                return false;
-            }
-        }
-
         public static Sprite? LoadSprite(string? textureName)
         {
             lock (LoadedSprites)
@@ -135,8 +64,6 @@ namespace MiniMap
                 return null;
             }
         }
-
-
         public static JObject? LoadConfig(string fileName)
         {
             string directoryName = GetDirectory();
@@ -153,7 +80,7 @@ namespace MiniMap
             }
             catch (Exception e)
             {
-                Debug.LogError($"[MiniMap] Failed to Load Congig({text}):\n{e.Message}");
+                Debug.LogError($"[{ModBehaviour.MOD_NAME}] Failed to Load Congig({text}):\n{e.Message}");
                 return null;
             }
         }

@@ -1,4 +1,6 @@
 using Duckov.MiniMaps.UI;
+using MiniMap.MonoBehaviours;
+using MiniMap.Utils;
 using System.Collections;
 using System.Reflection;
 using UnityEngine;
@@ -53,7 +55,7 @@ namespace MiniMap.Managers
         {
             if (IsInitialized)
             {
-                Debug.LogError("[MiniMap] MinimapManager 已初始化");
+                Debug.LogError($"[{ModBehaviour.MOD_NAME}] MinimapManager 已初始化");
                 return;
             }
             CreateMiniMapContainer();
@@ -67,7 +69,7 @@ namespace MiniMap.Managers
 
         public static void Destroy()
         {
-            Debug.Log($"[MiniMap] destroy minimap container");
+            Debug.Log($"[{ModBehaviour.MOD_NAME}] destroy minimap container");
             GameObject.Destroy(miniMapContainer);
             SceneManager.sceneLoaded -= OnSceneLoaded;
             ModSettingManager.ConfigLoaded -= OnConfigLoaded;
@@ -130,7 +132,7 @@ namespace MiniMap.Managers
             }
             catch (Exception e)
             {
-                Debug.LogError($"[MiniMap] Error Checking ToggleKey: {e.Message}");
+                Debug.LogError($"[{ModBehaviour.MOD_NAME}] Error Checking ToggleKey: {e.Message}");
             }
         }
 
@@ -154,7 +156,7 @@ namespace MiniMap.Managers
             }
             catch (Exception e)
             {
-                Debug.LogError($"[MiniMap] Error setting Enable: {e.Message}");
+                Debug.LogError($"[{ModBehaviour.MOD_NAME}] Error setting Enable: {e.Message}");
             }
         }
 
@@ -171,7 +173,7 @@ namespace MiniMap.Managers
             }
             catch (Exception e)
             {
-                Debug.LogError($"[MiniMap] Error trying to show minimap: {e.Message}");
+                Debug.LogError($"[{ModBehaviour.MOD_NAME}] Error trying to show minimap: {e.Message}");
             }
         }
 
@@ -188,7 +190,7 @@ namespace MiniMap.Managers
             }
             catch (Exception e)
             {
-                Debug.LogError($"[MiniMap] Error hiding minimap: {e.Message}");
+                Debug.LogError($"[{ModBehaviour.MOD_NAME}] Error hiding minimap: {e.Message}");
             }
         }
 
@@ -206,7 +208,7 @@ namespace MiniMap.Managers
             }
             catch (Exception e)
             {
-                Debug.LogError($"[MiniMap] Error starting setting minimap: {e.Message}");
+                Debug.LogError($"[{ModBehaviour.MOD_NAME}] Error starting setting minimap: {e.Message}");
             }
         }
 
@@ -246,7 +248,7 @@ namespace MiniMap.Managers
             }
             catch (Exception e)
             {
-                Debug.LogError($"[MiniMap] Error updating display zoom: {e.Message}");
+                Debug.LogError($"[{ModBehaviour.MOD_NAME}] Error updating display zoom: {e.Message}");
             }
         }
 
@@ -265,7 +267,7 @@ namespace MiniMap.Managers
             }
             catch (Exception e)
             {
-                Debug.LogError($"[MiniMap] Error setting minimap container scale: {e.Message}");
+                Debug.LogError($"[{ModBehaviour.MOD_NAME}] Error setting minimap container scale: {e.Message}");
             }
         }
 
@@ -292,7 +294,7 @@ namespace MiniMap.Managers
             }
             catch (Exception e)
             {
-                Debug.LogError($"[MiniMap] Error setting minimap position: {e.Message}");
+                Debug.LogError($"[{ModBehaviour.MOD_NAME}] Error setting minimap position: {e.Message}");
             }
         }
 
@@ -309,7 +311,7 @@ namespace MiniMap.Managers
                 float parentHeight = parentRect.rect.height;
                 if (parentRect.rect.width <= 0 || parentRect.rect.height <= 0)
                 {
-                    Debug.LogWarning($"[MiniMap] 父Canvas尺寸异常: {parentRect.rect.width} x {parentRect.rect.height}");
+                    Debug.LogWarning($"[{ModBehaviour.MOD_NAME}] 父Canvas尺寸异常: {parentRect.rect.width} x {parentRect.rect.height}");
                     return;
                 }
                 float miniMapPositionX = ModSettingManager.GetValue<float>("miniMapPositionX");
@@ -321,7 +323,7 @@ namespace MiniMap.Managers
             }
             catch (Exception e)
             {
-                Debug.LogError($"[MiniMap] Error setting minimap position: {e.Message}");
+                Debug.LogError($"[{ModBehaviour.MOD_NAME}] Error setting minimap position: {e.Message}");
             }
         }
 
@@ -329,18 +331,18 @@ namespace MiniMap.Managers
         {
             try
             {
-                Debug.Log($"[MiniMap] 加载场景 {scene.name} {mode}");
+                Debug.Log($"[{ModBehaviour.MOD_NAME}] 加载场景 {scene.name} {mode}");
                 if (LevelManager.Instance == null || !isEnabled)
                 {
                     customCanvas?.SetActive(false);
                     return;
                 }
-                Debug.Log($"[MiniMap] 初始化场景 {scene} {mode}");
-                Debug.Log("[MiniMap] 半速更新模式启用");
+                Debug.Log($"[{ModBehaviour.MOD_NAME}] 初始化场景 {scene} {mode}");
+                Debug.Log($"[{ModBehaviour.MOD_NAME}] 半速更新模式启用");
 
                 if (ModBehaviour.Instance == null)
                 {
-                    Debug.LogError("[MiniMap] ModBehaviour Instance is null!");
+                    Debug.LogError($"[{ModBehaviour.MOD_NAME}] ModBehaviour Instance is null!");
                     return;
                 }
                 if (initMapCor != null)
@@ -351,7 +353,7 @@ namespace MiniMap.Managers
             }
             catch (Exception e)
             {
-                Debug.LogError($"[MiniMap] Error on scene loaded: {e.Message}");
+                Debug.LogError($"[{ModBehaviour.MOD_NAME}] Error on scene loaded: {e.Message}");
             }
         }
 
@@ -370,7 +372,7 @@ namespace MiniMap.Managers
             }
             catch (Exception e)
             {
-                Debug.LogError($"[MiniMap] Error clearing map: {e.Message}");
+                Debug.LogError($"[{ModBehaviour.MOD_NAME}] Error clearing map: {e.Message}");
             }
         }
 
@@ -400,7 +402,7 @@ namespace MiniMap.Managers
             }
             catch (Exception e)
             {
-                Debug.LogError($"[MiniMap] Error handling UI block state: {e.Message}");
+                Debug.LogError($"[{ModBehaviour.MOD_NAME}] Error handling UI block state: {e.Message}");
             }
         }
 
@@ -451,14 +453,14 @@ namespace MiniMap.Managers
             }
             catch (Exception e)
             {
-                Debug.LogError($"[MiniMap] Error updating minimap: {e.Message}");
+                Debug.LogError($"[{ModBehaviour.MOD_NAME}] Error updating minimap: {e.Message}");
             }
         }
 
         public static IEnumerator ApplyMiniMapCoroutine()
         {
             yield return new WaitForSecondsRealtime(0.5f);
-            Debug.Log("[MiniMap] 初始化小地图");
+            Debug.Log($"[{ModBehaviour.MOD_NAME}] 初始化小地图");
             ApplyMiniMap();
             customCanvas?.SetActive(true);
         }
@@ -471,17 +473,17 @@ namespace MiniMap.Managers
                 {
                     if (ApplyDuplicatedMinimap())
                     {
-                        Debug.Log("[MiniMap] MiniMap Applied!");
+                        Debug.Log($"[{ModBehaviour.MOD_NAME}] MiniMap Applied!");
                     }
                 }
                 else
                 {
-                    Debug.LogError("[MiniMap] Failed to Apply MiniMap!");
+                    Debug.LogError($"[{ModBehaviour.MOD_NAME}] Failed to Apply MiniMap!");
                 }
             }
             catch (Exception e)
             {
-                Debug.LogError($"[MiniMap] Error Applying minimap: {e.Message}");
+                Debug.LogError($"[{ModBehaviour.MOD_NAME}] Error Applying minimap: {e.Message}");
             }
         }
 
@@ -489,7 +491,7 @@ namespace MiniMap.Managers
         {
             try
             {
-                Debug.Log("[MiniMap] Creating Mini Map Container");
+                Debug.Log($"[{ModBehaviour.MOD_NAME}] Creating Mini Map Container");
                 // 创建 Canvas
                 customCanvas = new GameObject("Zoink_MinimapCanvas");
                 var targetCanvas = customCanvas.AddComponent<Canvas>();
@@ -518,34 +520,34 @@ namespace MiniMap.Managers
                 miniMapRect.anchoredPosition = Vector2.zero;
 
                 // 创建遮罩区域
-                Util.CreateFilledRectTransform(miniMapRect, "Zoink_MiniMapMask", out GameObject? maskObject, out RectTransform? miniMapMaskRect);
+                CreateFilledRectTransform(miniMapRect, "Zoink_MiniMapMask", out GameObject? maskObject, out RectTransform? miniMapMaskRect);
                 if (maskObject == null || miniMapMaskRect == null)
                 {
                     return;
                 }
                 Image image = maskObject.AddComponent<Image>();
-                image.sprite = Util.LoadSprite("MiniMapMask.png");
+                image.sprite = ModConfig.LoadSprite("MiniMapMask.png");
                 Mask mask = maskObject.AddComponent<Mask>();
                 mask.showMaskGraphic = false;
 
                 // 创建边框区域
-                Util.CreateFilledRectTransform(miniMapRect, "Zoink_MiniMapBorder", out GameObject? borderObject, out RectTransform? miniMapBorderRect);
+                CreateFilledRectTransform(miniMapRect, "Zoink_MiniMapBorder", out GameObject? borderObject, out RectTransform? miniMapBorderRect);
                 if (borderObject == null || miniMapBorderRect == null)
                 {
                     return;
                 }
                 Image border = borderObject.AddComponent<Image>();
-                border.sprite = Util.LoadSprite("MiniMapBorder.png");
+                border.sprite = ModConfig.LoadSprite("MiniMapBorder.png");
                 miniMapBorderRect.eulerAngles = new Vector3(0f, 0f, MapBorderEulerZRotation);
 
                 // 创建指北针区域
-                Util.CreateFilledRectTransform(miniMapRect, "Zoink_MiniMapNorth", out GameObject? northObject, out miniMapNorthRect);
+                CreateFilledRectTransform(miniMapRect, "Zoink_MiniMapNorth", out GameObject? northObject, out miniMapNorthRect);
                 if (northObject == null || miniMapNorthRect == null)
                 {
                     return;
                 }
                 Image north = northObject.AddComponent<Image>();
-                north.sprite = Util.LoadSprite("MiniMapNorth.png");
+                north.sprite = ModConfig.LoadSprite("MiniMapNorth.png");
 
                 // 创建视窗区域
                 GameObject viewportObject = new GameObject("Zoink_MiniMapViewport");
@@ -569,11 +571,40 @@ namespace MiniMap.Managers
 
                 customCanvas.SetActive(false);
                 GameObject.DontDestroyOnLoad(customCanvas);
-                Debug.Log($"[MiniMap] Mini Map Container Created");
+                Debug.Log($"[{ModBehaviour.MOD_NAME}] Mini Map Container Created");
             }
             catch (Exception e)
             {
-                Debug.LogError($"[MiniMap] Error creating minimap container: {e.Message}");
+                Debug.LogError($"[{ModBehaviour.MOD_NAME}] Error creating minimap container: {e.Message}");
+            }
+        }
+        private static bool CreateFilledRectTransform(Transform parent, string objectName, out GameObject? gameObject, out RectTransform? rectTransform)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(objectName))
+                {
+                    objectName = "Zoink_NewGameObject";
+                }
+                if (!objectName.StartsWith("Zoink_"))
+                {
+                    objectName = "Zoink_" + objectName;
+                }
+                gameObject = new GameObject(objectName);
+                rectTransform = gameObject.AddComponent<RectTransform>();
+
+                rectTransform.SetParent(parent);
+                rectTransform.anchorMin = Vector2.zero;
+                rectTransform.anchorMax = Vector2.one;
+                rectTransform.offsetMin = Vector2.zero;
+                rectTransform.offsetMax = Vector2.zero;
+                return true;
+            }
+            catch (Exception)
+            {
+                gameObject = null;
+                rectTransform = null;
+                return false;
             }
         }
 
@@ -585,13 +616,13 @@ namespace MiniMap.Managers
                 Type minimapViewType = typeof(MiniMapView);
                 if (minimapViewType == null)
                 {
-                    Debug.LogError("[MiniMap] MinimapView type not found!");
+                    Debug.LogError($"[{ModBehaviour.MOD_NAME}] MinimapView type not found!");
                     return null;
                 }
                 MiniMapView minimapView = MiniMapView.Instance;
                 if (minimapView == null)
                 {
-                    Debug.LogError("[MiniMap] MinimapView instance not found!");
+                    Debug.LogError($"[{ModBehaviour.MOD_NAME}] MinimapView instance not found!");
                     return null;
                 }
 
@@ -605,7 +636,7 @@ namespace MiniMap.Managers
 
                     if (minimapDisplayProperty == null)
                     {
-                        Debug.LogError("[MiniMap] display field/property not found!");
+                        Debug.LogError($"[{ModBehaviour.MOD_NAME}] display field/property not found!");
                         return null;
                     }
 
@@ -630,7 +661,7 @@ namespace MiniMap.Managers
             }
             catch (Exception e)
             {
-                Debug.LogError($"[MiniMap] Error duplicating minimapdisplay: {e.Message}");
+                Debug.LogError($"[{ModBehaviour.MOD_NAME}] Error duplicating minimapdisplay: {e.Message}");
                 return false;
             }
         }
@@ -641,7 +672,7 @@ namespace MiniMap.Managers
             {
                 if (originalDisplay == null)
                 {
-                    Debug.LogError("[MiniMap] Original minimapdisplay is null!");
+                    Debug.LogError($"[{ModBehaviour.MOD_NAME}] Original minimapdisplay is null!");
                     return false;
                 }
 
@@ -654,13 +685,13 @@ namespace MiniMap.Managers
                     GameObject.Destroy(duplicatedMinimapDisplay);
                 }
                 duplicatedMinimapObject = GameObject.Instantiate(originalGameObject);
-                Debug.Log($"[MiniMap] duplicated minimap object: {duplicatedMinimapObject}");
+                Debug.Log($"[{ModBehaviour.MOD_NAME}] duplicated minimap object: {duplicatedMinimapObject}");
 
                 duplicatedMinimapDisplay = duplicatedMinimapObject?.GetComponent(originalDisplay.GetType()) as MiniMapDisplay;
                 //CallDisplayMethod("RegisterEvents");
                 if (duplicatedMinimapDisplay == null || duplicatedMinimapObject == null)
                 {
-                    Debug.LogError("[MiniMap] Failed to get duplicated MinimapDisplay component!");
+                    Debug.LogError($"[{ModBehaviour.MOD_NAME}] Failed to get duplicated MinimapDisplay component!");
                     GameObject.Destroy(duplicatedMinimapObject);
                     GameObject.Destroy(duplicatedMinimapDisplay);
                     return false;
@@ -670,7 +701,7 @@ namespace MiniMap.Managers
             }
             catch (Exception e)
             {
-                Debug.LogError($"[MiniMap] Error duplicating minimap GameObject: {e.Message}");
+                Debug.LogError($"[{ModBehaviour.MOD_NAME}] Error duplicating minimap GameObject: {e.Message}");
                 return false;
             }
         }
@@ -679,10 +710,10 @@ namespace MiniMap.Managers
         {
             try
             {
-                Debug.Log("[MiniMap] Applying MiniMap");
+                Debug.Log($"[{ModBehaviour.MOD_NAME}] Applying MiniMap");
                 if (duplicatedMinimapObject == null || duplicatedMinimapDisplay == null || miniMapScaleContainer == null)
                 {
-                    Debug.LogError("[MiniMap] 关键组件为null，无法应用当前地图！");
+                    Debug.LogError($"[{ModBehaviour.MOD_NAME}] 关键组件为null，无法应用当前地图！");
                     return false;
                 }
                 duplicatedMinimapObject.transform.SetParent(miniMapScaleContainer.transform);
@@ -704,7 +735,7 @@ namespace MiniMap.Managers
             }
             catch (Exception e)
             {
-                Debug.LogError($"[MiniMap] Error setting up duplicated minimap: {e.Message}");
+                Debug.LogError($"[{ModBehaviour.MOD_NAME}] Error setting up duplicated minimap: {e.Message}");
                 return false;
             }
         }
@@ -713,7 +744,7 @@ namespace MiniMap.Managers
         {
             if (duplicatedMinimapDisplay == null)
             {
-                Debug.LogError($"[MiniMap] Cannot call {methodName} - duplicatedMinimapDisplay is null!");
+                Debug.LogError($"[{ModBehaviour.MOD_NAME}] Cannot call {methodName} - duplicatedMinimapDisplay is null!");
                 return;
             }
 
@@ -729,12 +760,12 @@ namespace MiniMap.Managers
                 }
                 else
                 {
-                    Debug.LogWarning($"[MiniMap] {methodName} method not found in MinimapDisplay type. This might be expected if the method doesn't exist.");
+                    Debug.LogWarning($"[{ModBehaviour.MOD_NAME}] {methodName} method not found in MinimapDisplay type. This might be expected if the method doesn't exist.");
                 }
             }
             catch (Exception e)
             {
-                Debug.LogError($"[MiniMap] Error calling {methodName} method: {e.Message}");
+                Debug.LogError($"[{ModBehaviour.MOD_NAME}] Error calling {methodName} method: {e.Message}");
             }
         }
 
@@ -761,7 +792,7 @@ namespace MiniMap.Managers
             }
             catch (Exception e)
             {
-                Debug.LogError($"[MiniMap] Error updating minimap rotation: {e.Message}");
+                Debug.LogError($"[{ModBehaviour.MOD_NAME}] Error updating minimap rotation: {e.Message}");
             }
         }
 
@@ -793,7 +824,7 @@ namespace MiniMap.Managers
             }
             catch (Exception e)
             {
-                Debug.LogError($"[MiniMap] Error updating minimap position: {e.Message}");
+                Debug.LogError($"[{ModBehaviour.MOD_NAME}] Error updating minimap position: {e.Message}");
             }
         }
     }

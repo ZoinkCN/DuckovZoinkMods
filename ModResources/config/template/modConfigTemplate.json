@@ -10,6 +10,24 @@
                     "descEN": "Enable Mini Map",
                     "default": true
                 },
+                "showPetPoi": {
+                    "type": "toggle",
+                    "descCN": "显示宠物图标",
+                    "descEN": "Show Your Pet",
+                    "default": true
+                },
+                "showPoiInMap": {
+                    "type": "toggle",
+                    "descCN": "大地图显示敌人位置",
+                    "descEN": "Show Enemy In Map",
+                    "default": true
+                },
+                "showPoiInMiniMap": {
+                    "type": "toggle",
+                    "descCN": "小地图显示敌人位置",
+                    "descEN": "Show Enemy In Mini Map",
+                    "default": true
+                },
                 "alphaOnMouseEnter": {
                     "type": "slider",
                     "descCN": "鼠标进入时不透明度",
@@ -21,7 +39,7 @@
                 },
                 "miniMapWindowScale": {
                     "type": "slider",
-                    "descCN": "小地图窗口缩放",
+                   "descCN": "小地图窗口缩放",
                     "descEN": "Mini Map Window Scale",
                     "default": 1.6,
                     "min": 0.1,

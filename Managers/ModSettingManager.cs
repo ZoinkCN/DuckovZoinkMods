@@ -1,7 +1,8 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using MiniMap.Extentions;
+using MiniMap.Utils;
+using Newtonsoft.Json.Linq;
 using SodaCraft.Localizations;
 using UnityEngine;
-using static NodeCanvas.DialogueTrees.ProbabilitySelector;
 
 namespace MiniMap.Managers
 {
@@ -27,7 +28,7 @@ namespace MiniMap.Managers
             {
                 if (modSettings == null)
                 {
-                    modSettings = Util.LoadConfig(ModConfigFileName);
+                    modSettings = ModConfig.LoadConfig(ModConfigFileName);
                     if (modSettings == null)
                     {
                         modSettings = new JObject();
@@ -43,10 +44,10 @@ namespace MiniMap.Managers
             {
                 if (modSettingsTemplates == null)
                 {
-                    modSettingsTemplates = Util.LoadConfig(ModConfigTemplateFileName);
+                    modSettingsTemplates = ModConfig.LoadConfig(ModConfigTemplateFileName);
                     if (modSettingsTemplates == null)
                     {
-                        Debug.LogError("[MiniMap] 加载Mod配置模板失败，请确保template文件夹下存在modConfigTemplate.json文件");
+                        Debug.LogError($"[{ModBehaviour.MOD_NAME}] 加载Mod配置模板失败，请确保template文件夹下存在modConfigTemplate.json文件");
                         throw new System.Exception("Failed loading template. Please make sure the file \"modConfigTemplate.json\" is in \"template\" folder.");
                     }
                 }
@@ -71,7 +72,7 @@ namespace MiniMap.Managers
             }
             if (save)
             {
-                Util.SaveConfig(ModConfigFileName, ModSettings);
+                ModConfig.SaveConfig(ModConfigFileName, ModSettings);
             }
         }
 
@@ -107,7 +108,7 @@ namespace MiniMap.Managers
 
             LoadDefultNoUISettings();
 
-            Util.SaveConfig(ModConfigFileName, modSettings);
+            ModConfig.SaveConfig(ModConfigFileName, modSettings);
         }
 
         private static void SetUI(KeyValuePair<string, JToken?> config)
@@ -121,13 +122,13 @@ namespace MiniMap.Managers
             switch (value.Type)
             {
                 case JTokenType.Boolean:
-                    ModSettingAPI.SetValue(key, value.ToObject<bool>());
+                    Api.ModSettingAPI.SetValue(key, value.ToObject<bool>());
                     break;
                 case JTokenType.Float:
-                    ModSettingAPI.SetValue(key, value.ToObject<float>());
+                    Api.ModSettingAPI.SetValue(key, value.ToObject<float>());
                     break;
                 case JTokenType.String:
-                    ModSettingAPI.SetValue(key, value.ToString());
+                    Api.ModSettingAPI.SetValue(key, value.ToString());
                     break;
                 default:
                     return;
@@ -137,7 +138,7 @@ namespace MiniMap.Managers
 
         private static void CreateUI()
         {
-            Debug.Log("[MiniMap] Start Create Setting UI");
+            Debug.Log($"[{ModBehaviour.MOD_NAME}] Start Create Setting UI");
             try
             {
                 JToken? groups = ModSettingsTemplates["groups"];
@@ -156,7 +157,7 @@ namespace MiniMap.Managers
                                     CreateOneSetting(config);
                                     keys.Add(config.Key);
                                 }
-                                ModSettingAPI.AddGroup(
+                                Api.ModSettingAPI.AddGroup(
                                     group.Key,
                                     group.Value?[isChinese ? "descCN" : "descEN"]?.ToString() ?? "",
                                     keys
@@ -182,12 +183,12 @@ namespace MiniMap.Managers
                     }
                 }
                 needUpdate = false;
-                Debug.Log("[MiniMap] Setting UI Created");
+                Debug.Log($"[{ModBehaviour.MOD_NAME}] Setting UI Created");
                 ConfigLoaded?.Invoke();
             }
             catch (Exception e)
             {
-                Debug.LogError($"[MiniMap] Failed to Create Setting UI:{e.Message}");
+                Debug.LogError($"[{ModBehaviour.MOD_NAME}] Failed to Create Setting UI:{e.Message}");
                 throw;
             }
         }
@@ -213,7 +214,7 @@ namespace MiniMap.Managers
                         {
                             float min = option.Value?["min"]?.ToObject<float>() ?? 0f;
                             float max = option.Value?["max"]?.ToObject<float>() ?? 1f;
-                            ModSettingAPI.AddSlider(
+                            Api.ModSettingAPI.AddSlider(
                                 option.Key,
                                 option.Value?[isChinese ? "descCN" : "descEN"]?.ToString() ?? "",
                                 value,
@@ -238,7 +239,7 @@ namespace MiniMap.Managers
                         }
                         if (!noUI)
                         {
-                            ModSettingAPI.AddToggle(
+                            Api.ModSettingAPI.AddToggle(
                                 option.Key,
                                 option.Value?[isChinese ? "descCN" : "descEN"]?.ToString() ?? "",
                                 value.Value,
@@ -262,7 +263,7 @@ namespace MiniMap.Managers
                         if (!noUI)
                         {
                             KeyCode value = Enum.Parse<KeyCode>(valueString);
-                            ModSettingAPI.AddKeybinding(
+                            Api.ModSettingAPI.AddKeybinding(
                                 option.Key,
                                 option.Value?[isChinese ? "descCN" : "descEN"]?.ToString() ?? "",
                                 value,
@@ -291,7 +292,7 @@ namespace MiniMap.Managers
                         string valueString = options.Count > 0 ? options[value.Value] : string.Empty;
                         if (!noUI)
                         {
-                            ModSettingAPI.AddDropdownList(
+                            Api.ModSettingAPI.AddDropdownList(
                                 option.Key,
                                 option.Value?[isChinese ? "descCN" : "descEN"]?.ToString() ?? "",
                                 options,
@@ -321,7 +322,7 @@ namespace MiniMap.Managers
                         if (!noUI)
                         {
                             int characterLimit = option.Value?["characterLimit"]?.ToObject<int>() ?? 40;
-                            ModSettingAPI.AddInput(
+                            Api.ModSettingAPI.AddInput(
                                 option.Key,
                                 option.Value?[isChinese ? "descCN" : "descEN"]?.ToString() ?? "",
                                 value,
@@ -339,7 +340,7 @@ namespace MiniMap.Managers
                     {
                         if (!noUI)
                         {
-                            ModSettingAPI.AddButton(
+                            Api.ModSettingAPI.AddButton(
                                 option.Key,
                                 option.Value?[isChinese ? "descCN" : "descEN"]?.ToString() ?? "",
                                 option.Value?[isChinese ? "textCN" : "textEN"]?.ToString() ?? "",
@@ -350,7 +351,7 @@ namespace MiniMap.Managers
                     }
                 default:
                     {
-                        Debug.LogWarning($"[MiniMap] 未知的配置类型: {type}");
+                        Debug.LogWarning($"[{ModBehaviour.MOD_NAME}] 未知的配置类型: {type}");
                         break;
                     }
             }
@@ -361,7 +362,7 @@ namespace MiniMap.Managers
             if (ModSettings.ContainsKey(key) || create)
             {
                 ModSettings[key] = JToken.FromObject(value);
-                Util.SaveConfig(ModConfigFileName, ModSettings);
+                ModConfig.SaveConfig(ModConfigFileName, ModSettings);
             }
         }
 

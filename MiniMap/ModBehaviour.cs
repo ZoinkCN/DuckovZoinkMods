@@ -129,6 +129,11 @@ namespace MiniMap
             }
         }
 
+        void Start()
+        {
+            PoiManager.Start();
+        }
+
         void OnEvacuated(EvacuationInfo _info)
         {
             CustomMinimapManager.Hide();
@@ -176,6 +181,7 @@ namespace MiniMap
                     ModSettingManager.Update();
                 CustomMinimapManager.Update();
                 CustomMinimapManager.CheckToggleKey();
+                PoiManager.Update();
             }
             catch (Exception e)
             {

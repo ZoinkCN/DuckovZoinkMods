@@ -4,17 +4,22 @@ using MiniMap.Extentions;
 using MiniMap.Managers;
 using MiniMap.Utils;
 using SodaCraft.Localizations;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace MiniMap.Poi
 {
     public abstract class CharacterPointOfInterestBase : MonoBehaviour, IPointOfInterest
     {
+        private bool initialized = false;
+
         private CharacterMainControl? character;
         private string? cachedName;
         private bool showInMap;
         private bool showInMiniMap;
+        private bool showOnlyAcivated;
         private Sprite? icon;
+        private Color color = Color.white;
         private bool localized = true;
         private bool followActiveScene;
         private bool isArea;
@@ -25,6 +30,25 @@ namespace MiniMap.Poi
 
         public virtual CharacterMainControl? Character => character;
         public virtual string? CachedName { get => cachedName; set => cachedName = value; }
+        public virtual bool ShowOnlyAcivated
+        {
+            get => showOnlyAcivated;
+            set
+            {
+                if (showOnlyAcivated != value)
+                {
+                    showOnlyAcivated = value;
+                    if (value)
+                    {
+                        Unregister();
+                    }
+                    else
+                    {
+                        Register();
+                    }
+                }
+            }
+        }
         public virtual bool ShowInMap { get => showInMap; set => showInMap = value; }
         public virtual bool ShowInMiniMap
         {
@@ -46,6 +70,7 @@ namespace MiniMap.Poi
         public virtual string DisplayName => CachedName?.ToPlainText() ?? string.Empty;
         public virtual float ScaleFactor { get => scaleFactor; set => scaleFactor = value; }
         public virtual Color ShadowColor => Color.clear;
+        public virtual Color Color { get => color; set => color = value; }
         public virtual float ShadowDistance => 0f;
         public virtual bool Localized { get => localized; set => localized = value; }
         public virtual Sprite? Icon => icon;
@@ -72,23 +97,27 @@ namespace MiniMap.Poi
         public virtual bool HideIcon { get => hideIcon; set => hideIcon = value; }
         protected virtual void OnEnable()
         {
-            PointsOfInterests.Register(this);
+            Register();
         }
 
         protected virtual void OnDisable()
         {
-            PointsOfInterests.Unregister(this);
+            if (ShowOnlyAcivated)
+            {
+                Unregister();
+            }
         }
 
-        public virtual void Setup(Sprite? icon, CharacterMainControl character, string? cachedName = null, bool followActiveScene = false, string? overrideSceneID = null)
+        public virtual void Setup(Sprite? icon, CharacterMainControl character, bool showOnlyActivated, bool showInMap, bool showInMiniMap, bool showPetPoi, string? cachedName = null, bool followActiveScene = false, string? overrideSceneID = null)
         {
+            if (initialized) return;
             this.character = character;
             this.icon = icon;
             this.CachedName = cachedName;
             this.followActiveScene = followActiveScene;
             this.overrideSceneID = overrideSceneID;
-            PointsOfInterests.Unregister(this);
-            PointsOfInterests.Register(this);
+            SetShows(showOnlyActivated, showInMap, showInMiniMap, showPetPoi);
+            initialized = true;
         }
 
         protected virtual void Update()
@@ -98,16 +127,61 @@ namespace MiniMap.Poi
                 Destroy(this.gameObject);
                 return;
             }
+            if (Character?.IsMainCharacter ?? false)
+            {
+                ShowInMap = ShowInMiniMap = true;
+            }
+
+        }
+
+        public virtual void Register(bool force = false)
+        {
+            if (force)
+            {
+                PointsOfInterests.Unregister(this);
+            }
+            if (!PointsOfInterests.Points.Contains(this))
+            {
+                ModBehaviour.Instance?.ExecuteWithDebounce(() =>
+                {
+                    PointsOfInterests.Register(this);
+                }, () =>
+                {
+                    ModBehaviour.Logger.Log($"Handling Points Of Interests");
+                    CustomMinimapManager.CallDisplayMethod("HandlePointsOfInterests");
+                });
+            }
+        }
+
+        public virtual void Unregister()
+        {
+            ModBehaviour.Instance?.ExecuteWithDebounce(() =>
+                {
+                    PointsOfInterests.Unregister(this);
+                }, () =>
+                {
+                    ModBehaviour.Logger.Log($"Handling Points Of Interests");
+                    CustomMinimapManager.CallDisplayMethod("HandlePointsOfInterests");
+                });
+        }
+
+        public virtual void SetShows(bool showOnlyActivated, bool showInMap, bool showInMiniMap, bool showPetPoi)
+        {
+            ShowOnlyAcivated = showOnlyActivated;
             CharacterRandomPreset? preset = Character?.characterPreset;
             bool isMain = Character?.IsMainCharacter ?? false;
             if (preset?.name == "PetPreset_NormalPet")
             {
-                ShowInMap = ShowInMiniMap = ModSettingManager.GetValue("showPetPoi", true);
+                ShowInMap = ShowInMiniMap = showPetPoi;
             }
             else
             {
-                ShowInMap = ModSettingManager.GetValue("showPoiInMap", true) || isMain;
-                ShowInMiniMap = ModSettingManager.GetValue("showPoiInMiniMap", true) || isMain;
+                ShowInMap = showInMap || isMain;
+                ShowInMiniMap = showInMiniMap || isMain;
+            }
+            if (ShowOnlyAcivated && !(Character?.gameObject.activeSelf ?? false))
+            {
+                Unregister();
             }
         }
     }

@@ -1,4 +1,5 @@
 ﻿using MiniMap.Utils;
+using UnityEngine;
 
 namespace MiniMap.Poi
 {
@@ -13,6 +14,7 @@ namespace MiniMap.Poi
         public override string DisplayName => string.Empty;
         public override bool IsArea => false;
         public override float AreaRadius => 0;
+        public override Color Color => Color.white;
 
         protected override void Update()
         {

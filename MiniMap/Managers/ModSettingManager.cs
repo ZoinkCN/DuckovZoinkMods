@@ -39,7 +39,7 @@ namespace MiniMap.Managers
             }
         }
 
-        private static JObject ModSettingsTemplates
+        private static JObject? ModSettingsTemplates
         {
             get
             {
@@ -49,7 +49,6 @@ namespace MiniMap.Managers
                     if (modSettingsTemplates == null)
                     {
                         ModBehaviour.Logger.LogError($"加载Mod配置模板失败，请确保template文件夹下存在modConfigTemplate.json文件");
-                        throw new Exception("Failed loading template. Please make sure the file \"modConfigTemplate.json\" is in \"template\" folder.");
                     }
                 }
                 return modSettingsTemplates;
@@ -58,7 +57,7 @@ namespace MiniMap.Managers
 
         private static void LoadDefultNoUISettings(bool save = false)
         {
-            JToken? noUIConfigs = ModSettingsTemplates["noUIConfigs"];
+            JToken? noUIConfigs = ModSettingsTemplates?["noUIConfigs"];
             if (noUIConfigs is JObject noUIConfigsObj)
             {
                 foreach (KeyValuePair<string, JToken?> config in noUIConfigsObj)
@@ -83,7 +82,7 @@ namespace MiniMap.Managers
             {
                 modSettings = new JObject();
             }
-            JToken? groups = ModSettingsTemplates["groups"];
+            JToken? groups = ModSettingsTemplates?["groups"];
             if (groups != null)
             {
                 foreach (var group in groups)
@@ -98,7 +97,7 @@ namespace MiniMap.Managers
                     }
                 }
             }
-            JToken? extraConfigs = ModSettingsTemplates["extraConfigs"];
+            JToken? extraConfigs = ModSettingsTemplates?["extraConfigs"];
             if (extraConfigs is JObject extraConfigsObj)
             {
                 foreach (KeyValuePair<string, JToken?> config in extraConfigsObj)
@@ -142,7 +141,7 @@ namespace MiniMap.Managers
             ModBehaviour.Logger.Log($"Start Create Setting UI");
             try
             {
-                JToken? groups = ModSettingsTemplates["groups"];
+                JToken? groups = ModSettingsTemplates?["groups"];
                 if (groups != null)
                 {
                     if (groups is JObject groupsObj)
@@ -167,7 +166,7 @@ namespace MiniMap.Managers
                         }
                     }
                 }
-                JToken? extraConfigs = ModSettingsTemplates["extraConfigs"];
+                JToken? extraConfigs = ModSettingsTemplates?["extraConfigs"];
                 if (extraConfigs is JObject extraConfigsObj)
                 {
                     foreach (KeyValuePair<string, JToken?> config in extraConfigsObj)
@@ -175,7 +174,7 @@ namespace MiniMap.Managers
                         CreateOneSetting(config);
                     }
                 }
-                JToken? noUIConfigs = ModSettingsTemplates["noUIConfigs"];
+                JToken? noUIConfigs = ModSettingsTemplates?["noUIConfigs"];
                 if (noUIConfigs is JObject noUIConfigsObj)
                 {
                     foreach (KeyValuePair<string, JToken?> config in noUIConfigsObj)

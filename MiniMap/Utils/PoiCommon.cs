@@ -74,6 +74,10 @@ namespace MiniMap.Utils
             directionPoi = poiObject.GetComponent<DirectionPointOfInterest>();
             characterPoi = poiObject.GetComponent<SimplePointOfInterest>();
             characterPoi ??= poiObject.GetComponent<CharacterPointOfInterest>();
+            bool showOnlyActivated = ModSettingManager.GetValue("showOnlyActivated", false);
+            bool showPetPoi = ModSettingManager.GetValue("showPetPoi", true);
+            bool showInMap = ModSettingManager.GetValue("showPoiInMap", true);
+            bool showInMiniMap = ModSettingManager.GetValue("showPoiInMiniMap", true);
             if (characterPoi == null)
             {
                 CharacterRandomPreset? preset = character.characterPreset;
@@ -83,18 +87,11 @@ namespace MiniMap.Utils
                 }
                 characterPoi = poiObject.AddComponent<CharacterPointOfInterest>();
                 CharacterPointOfInterest pointOfInterest = (CharacterPointOfInterest)characterPoi;
-                ModBehaviour.Instance?.ExecuteWithDebounce(() =>
-                {
-                    ModBehaviour.Logger.Log($"Setting Up characterPoi for {(character.IsMainCharacter ? "Main Character" : preset.DisplayName)}");
-                    JObject? iconConfig = ModFileOperations.LoadJson("iconConfig.json", ModBehaviour.Logger);
-                    Sprite? icon = GetIcon(iconConfig, preset.name, out scaleFactor, out bool isBoss);
-                    pointOfInterest.Setup(icon, character, cachedName: preset.nameKey, followActiveScene: true);
-                    pointOfInterest.ScaleFactor = scaleFactor;
-                }, () =>
-                {
-                    ModBehaviour.Logger.Log($"Handling Points Of Interests");
-                    CustomMinimapManager.CallDisplayMethod("HandlePointsOfInterests");
-                });
+                ModBehaviour.Logger.Log($"Setting Up characterPoi for {(character.IsMainCharacter ? "Main Character" : preset.DisplayName)}");
+                JObject? iconConfig = ModFileOperations.LoadJson("iconConfig.json", ModBehaviour.Logger);
+                Sprite? icon = GetIcon(iconConfig, preset.name, out scaleFactor, out bool isBoss);
+                pointOfInterest.Setup(icon, character, showOnlyActivated, showInMap, showInMiniMap, showPetPoi, cachedName: preset.nameKey, followActiveScene: true);
+                pointOfInterest.ScaleFactor = scaleFactor;
             }
             if (directionPoi == null)
             {
@@ -105,18 +102,11 @@ namespace MiniMap.Utils
                 }
                 directionPoi = poiObject.AddComponent<DirectionPointOfInterest>();
                 DirectionPointOfInterest pointOfInterest = (DirectionPointOfInterest)directionPoi;
-                ModBehaviour.Instance?.ExecuteWithDebounce(() =>
-                {
-                    ModBehaviour.Logger.Log($"Setting Up directionPoi for {(character.IsMainCharacter ? "Main Character" : preset?.DisplayName)}");
-                    Sprite? icon = ModFileOperations.LoadSprite("CharactorDirection.png");
-                    pointOfInterest.BaseEulerAngle = 45f;
-                    pointOfInterest.Setup(icon, character: character, cachedName: preset?.DisplayName, followActiveScene: true);
-                    pointOfInterest.ScaleFactor = scaleFactor;
-                }, () =>
-                {
-                    ModBehaviour.Logger.Log($"Handling Points Of Interests");
-                    CustomMinimapManager.CallDisplayMethod("HandlePointsOfInterests");
-                });
+                ModBehaviour.Logger.Log($"Setting Up directionPoi for {(character.IsMainCharacter ? "Main Character" : preset?.DisplayName)}");
+                Sprite? icon = ModFileOperations.LoadSprite("CharactorDirection.png");
+                pointOfInterest.BaseEulerAngle = 45f;
+                pointOfInterest.Setup(icon, character, showOnlyActivated, showInMap, showInMiniMap, showPetPoi, cachedName: preset?.DisplayName, followActiveScene: true);
+                pointOfInterest.ScaleFactor = scaleFactor;
             }
         }
 

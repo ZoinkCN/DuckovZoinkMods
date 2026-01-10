@@ -19,8 +19,8 @@ namespace ZoinkModdingLibrary.Patcher
         private Type? targetType = null;
         private bool isPatched = false;
         private Dictionary<string, PatchEntry>? queue;
-        private Harmony? harmony;
-        private ModLogger? logger;
+        protected Harmony? harmony;
+        protected ModLogger? logger;
 
         public virtual bool IsPatched => isPatched;
 
@@ -68,9 +68,7 @@ namespace ZoinkModdingLibrary.Patcher
                 if (patchMethods.Count() == 0)
                 {
                     logger?.LogWarning($"没有找到任何需要被Patch的方法！是否没有定义 \"{typeof(MethodPatcherAttribute).Name}\" 特性（Attribute）?");
-                    return false;
                 }
-                logger?.Log($"Find {patchMethods.Count()} Methods to patch");
                 if (queue == null)
                 {
                     queue = new Dictionary<string, PatchEntry>();
@@ -146,6 +144,8 @@ namespace ZoinkModdingLibrary.Patcher
                 }
                 isPatched = false;
             }
+            ModManager.OnModWillBeDeactivated -= OnModWillBeDeactivated;
+            ModManager.OnModActivated -= OnModActivated;
         }
 
         protected virtual void OnModWillBeDeactivated(ModInfo mod, ModBehaviour modBehaviour)
@@ -166,13 +166,6 @@ namespace ZoinkModdingLibrary.Patcher
                 logger?.Log($"检测到匹配的Mod \"{mod.name}\" 被激活，尝试进行Patch");
                 Patch();
             }
-        }
-
-        public virtual void Dispose()
-        {
-            Unpatch();
-            ModManager.OnModWillBeDeactivated -= OnModWillBeDeactivated;
-            ModManager.OnModActivated -= OnModActivated;
         }
     }
 }

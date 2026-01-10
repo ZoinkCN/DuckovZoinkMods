@@ -74,7 +74,7 @@ namespace BetterModUpload
             Logger.LogError("Unpatching...");
             foreach (var patcher in patchers)
             {
-                patcher.Dispose();
+                patcher.Unpatch();
             }
         }
 

@@ -8,19 +8,21 @@ using MiniMap.Utils;
 using ZoinkModdingLibrary.Patcher;
 using ZoinkModdingLibrary;
 using MiniMap.Compatibility.BetterMapMarker.Patchers;
+using Unity.VisualScripting;
+using MiniMap.Compatibility;
 
 namespace MiniMap
 {
 
     public class ModBehaviour : Duckov.Modding.ModBehaviour
     {
-        const string MOD_ID = "com.zoink.minimap";
+        public static readonly string MOD_ID = "com.zoink.minimap";
 
-        public static string MOD_NAME = "MiniMap";
+        public static readonly string MOD_NAME = "MiniMap";
         public static ModLogger Logger { get; } = new ModLogger(MOD_NAME);
         public static Harmony Harmony { get; } = new Harmony(MOD_ID);
 
-        public static ModBehaviour? Instance;
+        public static ModBehaviour? Instance { get; private set; }
 
         private List<PatcherBase> patchers = new List<PatcherBase>() {
             CharacterSpawnerRootPatcher.Instance,
@@ -28,8 +30,6 @@ namespace MiniMap
             MiniMapCompassPatcher.Instance,
             MiniMapDisplayPatcher.Instance,
             MapMarkerManagerPatcher.Instance,
-
-            ModBehaviourPatcher.Instance, // BetterMapMarker 兼容补丁
         };
 
         public bool PatchSingleExtender(Type targetType, Type extenderType, string methodName, BindingFlags bindFlags = BindingFlags.Instance | BindingFlags.Public)
@@ -98,7 +98,7 @@ namespace MiniMap
             {
                 foreach (var patcher in patchers)
                 {
-                    patcher.Dispose();
+                    patcher.Unpatch();
                 }
             }
             catch (Exception e)
@@ -114,6 +114,7 @@ namespace MiniMap
                 return;
             }
             Instance = this;
+            gameObject.GetOrAddComponent<CompatibilityManager>();
         }
 
         void OnEnable()
@@ -126,6 +127,7 @@ namespace MiniMap
                 LevelManager.OnEvacuated += OnEvacuated;
                 //SceneLoader.onFinishedLoadingScene += PoiManager.OnFinishedLoadingScene;
                 //LevelManager.OnAfterLevelInitialized += PoiManager.OnLenvelIntialized;
+
             }
             catch (Exception e)
             {

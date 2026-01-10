@@ -78,7 +78,7 @@
             }
         },
         "POI": {
-            "descCN": "单位显示",   
+            "descCN": "单位显示",
             "descEN": "Position Display",
             "configs": {
                 "showOnlyActivated": {
@@ -167,6 +167,18 @@
                     "min": 0.1,
                     "max": 2.0,
                     "decimalPlaces": 2
+                }
+            }
+        },
+        "Compatibility.ShoulderSurfing": {
+            "descCN": "兼容性-第三人称越肩视角",
+            "descEN": "Compatibility-ShoulderSurfing",
+            "configs": {
+                "shoulderSurfing.showPlayerArrow": {
+                    "type": "toggle",
+                    "descCN": "显示玩家指示器",
+                    "descEN": "Show Player Arrow",
+                    "default": false
                 }
             }
         }

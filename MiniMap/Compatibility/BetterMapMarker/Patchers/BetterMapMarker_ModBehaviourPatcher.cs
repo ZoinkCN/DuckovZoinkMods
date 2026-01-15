@@ -20,10 +20,16 @@ namespace MiniMap.Compatibility.BetterMapMarker.Patchers
         public static void UpdateMarkerPrefix(object marker)
         {
             SimplePointOfInterest? poi = marker.GetField<SimplePointOfInterest>("Poi");
-            if (poi != null)
+            if (poi != null && !poi.name.StartsWith("LootboxMarker:"))
             {
                 poi.name = "LootboxMarker:" + poi.name;
             }
+        }
+
+        [MethodPatcher("Update", PatchType.Prefix, BindingFlags.Instance | BindingFlags.NonPublic)]
+        public static bool UpdatePrefix()
+        {
+            return false;
         }
 
         [MethodPatcher("GetDisplayName", PatchType.Prefix, BindingFlags.Static | BindingFlags.NonPublic)]
@@ -31,13 +37,10 @@ namespace MiniMap.Compatibility.BetterMapMarker.Patchers
         {
             bool flag = lootbox.name.Contains("Formula", StringComparison.OrdinalIgnoreCase);
             string? name = null;
-            if (flag)
+            if (flag && lootbox.Inventory.Content.Count > 0)
             {
-                if (lootbox.Inventory.Content.Count > 0)
-                {
-                    Item item = lootbox.Inventory[0];
-                    name = item.GetField<string>("displayName");
-                }
+                Item item = lootbox.Inventory[0];
+                name = item.GetField<string>("displayName");
             }
             __result = (name ?? lootbox.GetField<string>("displayNameKey")) ?? "";
 

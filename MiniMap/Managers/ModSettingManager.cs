@@ -136,7 +136,7 @@ namespace MiniMap.Managers
             ModSettings[config.Key] = value;
         }
 
-        private static void CreateUI()
+        public static void CreateUI()
         {
             ModBehaviour.Logger.Log($"Start Create Setting UI");
             try

@@ -127,6 +127,7 @@ namespace MiniMap
                 LevelManager.OnEvacuated += OnEvacuated;
                 //SceneLoader.onFinishedLoadingScene += PoiManager.OnFinishedLoadingScene;
                 //LevelManager.OnAfterLevelInitialized += PoiManager.OnLenvelIntialized;
+				LevelManager.OnAfterLevelInitialized += ModSettingManager.CreateUI;
 
             }
             catch (Exception e)
@@ -149,6 +150,7 @@ namespace MiniMap
                 LevelManager.OnEvacuated -= OnEvacuated;
                 //SceneLoader.onFinishedLoadingScene -= PoiManager.OnFinishedLoadingScene;
                 //LevelManager.OnAfterLevelInitialized -= PoiManager.OnLenvelIntialized;
+				LevelManager.OnAfterLevelInitialized -= ModSettingManager.CreateUI;
                 CustomMinimapManager.Destroy();
                 Logger.Log($"disable mod {MOD_NAME}");
             }
@@ -179,8 +181,7 @@ namespace MiniMap
         {
             try
             {
-                if (ModSettingManager.needUpdate)
-                    ModSettingManager.Update();
+                // if (ModSettingManager.needUpdate) ModSettingManager.Update();
                 CustomMinimapManager.Update();
                 CustomMinimapManager.CheckToggleKey();
                 //PoiManager.Update();

@@ -15,7 +15,7 @@ using ZoinkModdingLibrary.Patcher;
 
 namespace MiniMap.Patchers
 {
-    [TypePatcher(typeof(CharacterPoiEntry))]
+    [TypePatcher(typeof(PointOfInterestEntry))]
     public class PointOfInterestEntryPatcher : PatcherBase
     {
         public static new PatcherBase Instance { get; } = new PointOfInterestEntryPatcher();

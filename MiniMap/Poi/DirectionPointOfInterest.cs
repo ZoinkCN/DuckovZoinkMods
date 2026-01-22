@@ -18,15 +18,20 @@ namespace MiniMap.Poi
 
         protected override void Update()
         {
+            if (Character == null || CharacterType != CharacterType.Main && PoiCommon.IsDead(Character))
+            {
+                Destroy(this.gameObject);
+                return;
+            }
             base.Update();
-            bool isMain = Character?.IsMainCharacter ?? false;
+            bool isMain = Character.IsMainCharacter;
             if (isMain)
             {
                 RotationEulerAngle = MiniMapCommon.GetChracterRotation().eulerAngles.z;
             }
             else
             {
-                RotationEulerAngle = MiniMapCommon.GetChracterRotation(Character!.movementControl.targetAimDirection).eulerAngles.z;
+                RotationEulerAngle = -Character.transform.Find("ModelRoot").rotation.eulerAngles.y;
             }
         }
     }

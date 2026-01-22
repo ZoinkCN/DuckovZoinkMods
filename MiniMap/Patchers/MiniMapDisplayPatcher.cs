@@ -64,9 +64,8 @@ namespace MiniMap.Patchers
         {
             try
             {
-                __instance.transform.rotation = ModSettingManager.GetValue<bool>("mapRotation")
-                    ? MiniMapCommon.GetPlayerMinimapRotationInverse()
-                    : Quaternion.Euler(0f, 0f, MiniMapCommon.originMapZRotation);
+                float rotationAngle = ModSettingManager.GetValue<bool>("mapRotation") ? MiniMapCommon.GetMinimapRotation() : MiniMapCommon.originMapZRotation;
+                __instance.transform.rotation = Quaternion.Euler(0f, 0f, rotationAngle);
                 return false;
             }
             catch (Exception e)

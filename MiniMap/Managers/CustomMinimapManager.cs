@@ -793,18 +793,10 @@ namespace MiniMap.Managers
                 {
                     return;
                 }
-                if (ModSettingManager.GetValue<bool>("miniMapRotation"))
-                {
-                    var rotation = MiniMapCommon.GetPlayerMinimapRotationInverse();
-                    duplicatedMinimapDisplay.transform.rotation = rotation;
-                    miniMapNorthRect.localRotation = Quaternion.Euler(0, 0, rotation.eulerAngles.z/* + MapNorthEulerZRotation*/);
-                }
-                else
-                {
-                    var rotation = Quaternion.Euler(0f, 0f, MiniMapCommon.originMapZRotation);
-                    duplicatedMinimapDisplay.transform.rotation = rotation;
-                    miniMapNorthRect.localRotation = Quaternion.Euler(0, 0, rotation.eulerAngles.z/* + MapNorthEulerZRotation*/);
-                }
+                float rotationAngle = ModSettingManager.GetValue<bool>("miniMapRotation") ? MiniMapCommon.GetMinimapRotation() : MiniMapCommon.originMapZRotation;
+                var rotation = Quaternion.Euler(0, 0, rotationAngle);
+                duplicatedMinimapDisplay.transform.rotation = rotation;
+                miniMapNorthRect.localRotation = rotation;
             }
             catch (Exception e)
             {

@@ -24,15 +24,7 @@ namespace MiniMap.Poi
                 return;
             }
             base.Update();
-            bool isMain = Character.IsMainCharacter;
-            if (isMain)
-            {
-                RotationEulerAngle = MiniMapCommon.GetChracterRotation().eulerAngles.z;
-            }
-            else
-            {
-                RotationEulerAngle = -Character.transform.Find("ModelRoot").rotation.eulerAngles.y;
-            }
+            RotationEulerAngle = MiniMapCommon.GetChracterRotation(Character);
         }
     }
 }

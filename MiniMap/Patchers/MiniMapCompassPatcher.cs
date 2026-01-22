@@ -36,9 +36,8 @@ namespace MiniMap.Patchers
                 {
                     return false;
                 }
-                trans.localRotation = ModSettingManager.GetValue<bool>("mapRotation")
-                    ? MiniMapCommon.GetChracterRotation()
-                    : Quaternion.Euler(0f, 0f, MiniMapCommon.originMapZRotation);
+                float rotationAngle = ModSettingManager.GetValue<bool>("mapRotation") ? MiniMapCommon.GetMinimapRotation() : MiniMapCommon.originMapZRotation;
+                trans.localRotation = Quaternion.Euler(0f, 0f, rotationAngle);
                 return false;
             }
             catch (Exception e)

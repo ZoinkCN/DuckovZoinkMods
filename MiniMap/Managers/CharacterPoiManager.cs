@@ -101,10 +101,10 @@ namespace MiniMap.Managers
                 return;
             }
             //ModBehaviour.Logger.Log($"正在创建标记点: {poi.DisplayName}");
-            //if (!poi.WillShow(isOriginalMap))
-            //{
-            //    return;
-            //}
+            if (!poi.WillShow(isOriginalMap))
+            {
+                return;
+            }
             int targetSceneIndex = poi.OverrideScene >= 0 ? poi.OverrideScene : poi.gameObject.scene.buildIndex;
 
             if (MultiSceneCore.ActiveSubScene.HasValue && targetSceneIndex == MultiSceneCore.ActiveSubScene.Value.buildIndex)

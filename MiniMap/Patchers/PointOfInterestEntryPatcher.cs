@@ -35,12 +35,12 @@ public static bool UpdateScalePrefix(
     {
         float d = ___pointOfInterest?.ScaleFactor ?? 1f;
         
+        // 判断当前显示的是系统地图还是Mod地图
+        bool isInMiniMap = ___master == CustomMinimapManager.DuplicatedMinimapDisplay;
+        
         // 如果是CharacterPoiBase（包括位置图标和方向箭头）
         if (___pointOfInterest is CharacterPoiBase characterPoi)
         {
-            // 判断当前显示的是系统地图还是Mod地图
-            bool isInMiniMap = ___master == CustomMinimapManager.DuplicatedMinimapDisplay;
-            
             // 判断是否是中心图标（玩家自己的图标）
             bool isCenterIcon = characterPoi.CharacterType == CharacterType.Main;
             
@@ -49,7 +49,7 @@ public static bool UpdateScalePrefix(
                 // 中心图标：区分小地图和系统地图
                 if (isInMiniMap)
                 {
-                    // 在小地图中：直接读取 miniMapCenterIconSize 配置
+                    // 在小地图中：使用 miniMapCenterIconSize 配置
                     d = characterPoi.ScaleFactor * ModSettingManager.GetValue("miniMapCenterIconSize", 1.0f);
                 }
                 else
@@ -80,6 +80,15 @@ public static bool UpdateScalePrefix(
                 d = characterPoi.ScaleFactor * iconSizeFactor;
             }
         }
+        
+        // ============ 应用小地图全局调节因子 ============
+        if (isInMiniMap)
+        {
+            // 只在小地图中应用全局调节因子
+            float globalFactor = ModSettingManager.GetValue("miniMapGlobalSize", 1.0f);
+            d *= globalFactor;
+        }
+        // ============ 应用结束 ============
         
         float parentLocalScale = __instance.GetProperty<float>("ParentLocalScale");
         int iconScaleType = ModSettingManager.GetValue("iconScaleType", 0);

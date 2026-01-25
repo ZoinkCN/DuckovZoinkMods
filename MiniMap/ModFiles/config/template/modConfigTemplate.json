@@ -104,6 +104,15 @@
 					"max": 1.0,
 					"decimalPlaces": 1
 				},
+				"miniMapGlobalSize": {
+					"type": "slider",
+					"descCN": "小地图全局调节",
+					"descEN": "Global Mini Map Scale",
+					"default": 1.0,
+					"min": 0.2,
+					"max": 1.0,
+					"decimalPlaces": 1
+				},
                 "showOnlyActivated": {
                     "type": "toggle",
                     "descCN": "仅显示附近敌人（建议打开）",

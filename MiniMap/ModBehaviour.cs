@@ -125,9 +125,8 @@ namespace MiniMap
             {
                 MinimapManager.Initialize();
                 ApplyHarmonyPatchers();
-                
-                // 初始化死亡事件处理器
-                DeathEventHandler.Initialize();
+                GlobalAsyncProcessor.Initialize(); // 初始化异步处理器
+                DeathEventHandler.Initialize(); // 初始化死亡事件处理器
                 
                 ModManager.OnModActivated += ModManager_OnModActivated;
                 LevelManager.OnEvacuated += OnEvacuated;
@@ -155,9 +154,8 @@ namespace MiniMap
             try
             {
                 CancelHarmonyPatchers();
-                
-                // 清理死亡事件处理器
-                DeathEventHandler.Cleanup();
+                GlobalAsyncProcessor.Destroy();     // 销毁异步处理器
+                DeathEventHandler.Cleanup(); // 清理死亡事件处理器
                 
                 ModManager.OnModActivated -= ModManager_OnModActivated;
                 LevelManager.OnEvacuated -= OnEvacuated;

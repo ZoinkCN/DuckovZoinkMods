@@ -23,12 +23,14 @@ namespace MiniMap.Patchers
 
 [MethodPatcher("UpdateScale", PatchType.Prefix, BindingFlags.Instance | BindingFlags.NonPublic)]
 public static bool UpdateScalePrefix(
-    CharacterPoiEntry __instance,
+    PointOfInterestEntry __instance,
     MiniMapDisplay ___master,
     IPointOfInterest ___pointOfInterest,
     Transform ___iconContainer,
     ProceduralImage ___areaDisplay,
-    float ___areaLineThickness
+    float ___areaLineThickness,
+    // Harmony会自动注入这些字段！
+    TextMeshProUGUI ___displayName      // displayName字段
 )
 {
     try
@@ -90,12 +92,27 @@ public static bool UpdateScalePrefix(
         }
         // ============ 应用结束 ============
         
-        float parentLocalScale = __instance.GetProperty<float>("ParentLocalScale");
-        int iconScaleType = ModSettingManager.GetValue("iconScaleType", 0);
+        float parentLocalScale = __instance.transform.parent.localScale.x;
         var baseScale = Vector3.one * d / parentLocalScale;
         
-        // 应用缩放
+        // ============ 关键：处理显示名称缩放问题 ============
+        // 现在可以直接使用 ___displayName，不需要反射！
+        
+        // 1. 应用图标缩放
         ___iconContainer.localScale = baseScale;
+        
+        // 2. 处理显示名称：使其不受图标缩放影响
+        if (___displayName != null && ___displayName.transform != null)
+        {
+            // 检查显示名称是否在 iconContainer 内
+            bool isInIconContainer = ___displayName.transform.IsChildOf(___iconContainer);
+            
+            if (isInIconContainer)
+            {
+				___displayName.transform.localScale = Vector3.one  / d;
+            }
+        }
+        // ============ 处理结束 ============
         
         if (___pointOfInterest != null && ___pointOfInterest.IsArea)
         {
@@ -103,12 +120,12 @@ public static bool UpdateScalePrefix(
             ___areaDisplay.FalloffDistance = 1f / parentLocalScale;
         }
 
-        return false;
+        return false; // 跳过原始方法
     }
     catch (Exception e)
     {
         ModBehaviour.Logger.LogError($"UpdateScalePrefix failed: {e.Message}");
-        return true;
+        return true; // 执行原始方法
     }
 }
 

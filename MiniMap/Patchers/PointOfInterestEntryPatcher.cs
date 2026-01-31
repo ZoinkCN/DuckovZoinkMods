@@ -35,22 +35,24 @@ public static bool UpdateScalePrefix(
     try
     {
         if (___pointOfInterest == null) return true;
-        
-        bool isInMiniMap = ___master == MinimapManager.MinimapDisplay;
+		
+        bool isInMiniMap = ___master == MinimapManager.MinimapDisplay; // 判断当前显示的是系统地图还是Mod地图
         bool isCharacterPoi = ___pointOfInterest is CharacterPoiBase;
-        float displayZoomScale = ModSettingManager.GetValue("displayZoomScale", 5f);
-        
-        // 获取父对象缩放
-        float parentLocalScale = __instance.transform.parent.localScale.x;
         
         // 处理图标缩放
         float d = ___pointOfInterest.ScaleFactor;
         if (isCharacterPoi)
         {
             CharacterPoiBase characterPoi = ___pointOfInterest as CharacterPoiBase;
+			if (characterPoi == null && !isInMiniMap) return true;
             d = characterPoi?.IconSize ?? d;
         }
-        
+		
+        float displayZoomScale = ModSettingManager.GetValue("displayZoomScale", 5f);
+		float CascadeScalingUnits = ModSettingManager.GetValue("CascadeScalingUnits", 2.5f);
+
+        // 获取父对象缩放
+        float parentLocalScale = __instance.transform.parent.localScale.x;
         var baseScale = Vector3.one * (d / parentLocalScale);
         
         // ============ 统一处理逻辑 ============
@@ -63,9 +65,9 @@ public static bool UpdateScalePrefix(
                 if (___displayName != null)
                 {
                     ___displayName.gameObject.SetActive(shouldShowName);
-                    if (shouldShowName)
+                    if (shouldShowName) // 场景片区名字
                     {
-                        ___displayName.transform.localScale = Vector3.one * 1.5f;
+                        ___displayName.transform.localScale = Vector3.one * (CascadeScalingUnits * 0.6f);
                     }
                 }
                 
@@ -73,13 +75,13 @@ public static bool UpdateScalePrefix(
                 if (___iconContainer != null)
                 {
                     ___iconContainer.gameObject.SetActive(true);
-                    if (shouldShowName)
+                    if (shouldShowName)  // 场景片区名
                     {
-                        ___iconContainer.localScale = baseScale / 2.5f;
+                        ___iconContainer.localScale = baseScale / CascadeScalingUnits;
                     }
                     else
                     {
-                        ___iconContainer.localScale = baseScale / 1.7f;
+                        ___iconContainer.localScale = baseScale / (CascadeScalingUnits * 0.8f);
                     }
                 }
             }
@@ -112,7 +114,7 @@ public static bool UpdateScalePrefix(
                         ___displayName.gameObject.SetActive(shouldShowName);
                         if (shouldShowName)
                         {
-                            ___displayName.transform.localScale = Vector3.one * 2.0f;
+                            ___displayName.transform.localScale = Vector3.one * (CascadeScalingUnits * 0.8f);
                         }
                     }
                     
@@ -152,7 +154,7 @@ public static bool UpdateScalePrefix(
                     else
                     {
                         ___displayName.gameObject.SetActive(true);
-                        ___displayName.transform.localScale = Vector3.one * 2.0f;
+                        ___displayName.transform.localScale = Vector3.one * (CascadeScalingUnits * 0.8f);
                     }
                     
                     // 图标容器始终显示
@@ -161,7 +163,7 @@ public static bool UpdateScalePrefix(
                     // 图标缩放（中心图标放大2.5倍）
                     if (isCenterIcon)
                     {
-                        ___iconContainer.localScale = baseScale * 2.5f;
+                        ___iconContainer.localScale = baseScale * CascadeScalingUnits;
                     }
                     else
                     {

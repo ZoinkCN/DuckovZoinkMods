@@ -122,8 +122,12 @@ namespace MiniMap.Poi
             this.character = character;
             this.characterType = characterType;
             this.icon = GameObject.Instantiate(poi.Icon);
-            FieldInfo? field = typeof(SimplePointOfInterest).GetField("displayName", BindingFlags.NonPublic | BindingFlags.Instance);
-            this.cachedName = field.GetValue(poi) as string;
+			// ============ 修改：直接访问公共属性 ============
+			// FieldInfo? field = typeof(SimplePointOfInterest).GetField("displayName", BindingFlags.NonPublic | BindingFlags.Instance);
+			// this.cachedName = field.GetValue(poi) as string;
+			
+			this.cachedName = poi.DisplayName;  // ← 直接访问！
+			// ============ 修改结束 ============
             this.followActiveScene = followActiveScene;
             this.overrideSceneID = overrideSceneID;
             this.isArea = poi.IsArea;

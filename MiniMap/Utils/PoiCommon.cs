@@ -1,6 +1,4 @@
 ﻿using Duckov.MiniMaps;
-using MiniMap.Extentions;
-using MiniMap.Managers;
 using MiniMap.Poi;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
@@ -30,8 +28,8 @@ namespace MiniMap.Utils
                 JObject? data = config["main"] as JObject;
                 string? iconName = data?.Value<string?>("icon");
                 string? arrowName = data?.Value<string?>("arrow") ?? overallDefaultArrowName;
-                iconData.Icon = ModFileOperations.LoadSprite(iconName);
-                iconData.Arrow = ModFileOperations.LoadSprite(arrowName);
+                iconData.Icon = ModFileOperations.LoadSprite(ModBehaviour.ModInfo, iconName);
+                iconData.Arrow = ModFileOperations.LoadSprite(ModBehaviour.ModInfo, arrowName);
                 iconData.IconScale = data?.Value<float?>("iconScale") ?? overallDefaultIconScale;
                 iconData.ArrowScale = data?.Value<float?>("arrowScale") ?? overallDefaultArrowScale;
                 characterType = CharacterType.Main;
@@ -54,8 +52,8 @@ namespace MiniMap.Utils
                     JObject? data = jObject[presetName] as JObject;
                     string? iconName = data?.Value<string?>("icon") ?? typeDefaultIconName;
                     string? arrowName = data?.Value<string?>("arrow") ?? typeDefaultArrowName;
-                    iconData.Icon = ModFileOperations.LoadSprite(iconName);
-                    iconData.Arrow = ModFileOperations.LoadSprite(arrowName);
+                    iconData.Icon = ModFileOperations.LoadSprite(ModBehaviour.ModInfo, iconName);
+                    iconData.Arrow = ModFileOperations.LoadSprite(ModBehaviour.ModInfo, arrowName);
                     iconData.IconScale = data?.Value<float?>("iconScale") ?? typeDefaultIconScale;
                     iconData.ArrowScale = data?.Value<float?>("arrowScale") ?? typeDefaultArrowScale;
                     iconData.HideIcon = data?.Value<bool>("hideIcon") ?? false;
@@ -78,8 +76,8 @@ namespace MiniMap.Utils
                     return iconData;
                 }
             }
-            iconData.Icon = ModFileOperations.LoadSprite(overallDefaultIconName);
-            iconData.Arrow = ModFileOperations.LoadSprite(overallDefaultArrowName);
+            iconData.Icon = ModFileOperations.LoadSprite(ModBehaviour.ModInfo, overallDefaultIconName);
+            iconData.Arrow = ModFileOperations.LoadSprite(ModBehaviour.ModInfo, overallDefaultArrowName);
             iconData.IconScale = overallDefaultIconScale;
             iconData.ArrowScale = overallDefaultArrowScale;
             characterType = CharacterType.Enemy;
@@ -121,7 +119,7 @@ namespace MiniMap.Utils
             if (characterPoi == null)
             {
                 characterPoi = poiObject.AddComponent<CharacterPoi>();
-                JObject? iconConfig = ModFileOperations.LoadJson("iconConfig.json", ModBehaviour.Logger);
+                JObject? iconConfig = ModFileOperations.LoadConfig(ModBehaviour.ModInfo, "iconConfig.json");
                 CharacterPoiIconData iconData = GetIcon(iconConfig, character, out characterType);
                 Sprite? icon = iconData.Icon;
                 Sprite? arrowIcon = iconData.Arrow;

@@ -1,11 +1,13 @@
 ﻿using Duckov.MiniMaps.UI;
 using LeTai.TrueShadow;
+using MiniMap.Managers;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.UI.ProceduralImage;
+using ZoinkModdingLibrary.ModSettings;
 
 namespace MiniMap.Poi
 {
@@ -198,11 +200,63 @@ namespace MiniMap.Poi
 
         private void UpdateScale()
         {
+            if (target == null) return;
+            float d;
+
+            // 判断当前显示的是系统地图还是Mod地图
+            bool isInMiniMap = master == MinimapManager.MinimapDisplay;
+
+            // 如果是CharacterPoiBase（包括位置图标和方向箭头）
+            // 判断是否是中心图标（玩家自己的图标）
+            bool isCenterIcon = target.CharacterType == CharacterType.Main;
+            if (isCenterIcon)
+            {
+                // 中心图标：区分小地图和系统地图
+                d = isInMiniMap
+                    ? target.IconScaleFactor * ModSettingManager.GetValue(ModBehaviour.ModInfo, "miniMapCenterIconSize", 1.0f)
+                    : target.IconScaleFactor;
+            }
+            else
+            {
+                // 根据角色类型获取对应的图标大小配置
+                float iconSizeFactor = 1.0f;
+                switch (target.CharacterType)
+                {
+                    case CharacterType.Pet:
+                        iconSizeFactor = ModSettingManager.GetValue(ModBehaviour.ModInfo, "petIconSize", 0.8f);
+                        break;
+                    case CharacterType.Boss:
+                        iconSizeFactor = ModSettingManager.GetValue(ModBehaviour.ModInfo, "bossIconSize", 1.2f);
+                        break;
+                    case CharacterType.Enemy:
+                    case CharacterType.NPC:
+                    case CharacterType.Neutral:
+                        iconSizeFactor = ModSettingManager.GetValue(ModBehaviour.ModInfo, "enemyIconSize", 1.0f);
+                        break;
+                }
+
+                d = target.IconScaleFactor * iconSizeFactor;
+            }
+
+            // ============ 应用小地图全局调节因子 ============
+            if (isInMiniMap)
+            {
+                // 只在小地图中应用全局调节因子
+                float globalFactor = ModSettingManager.GetValue(ModBehaviour.ModInfo, "miniMapGlobalSize", 1.0f);
+                d *= globalFactor;
+            }
+            // ============ 应用结束 ============
+
+            int iconScaleType = ModSettingManager.GetValue(ModBehaviour.ModInfo, "iconScaleType", 0);
+            var baseScale = Vector3.one * d / ParentLocalScale;
+
+            // 应用缩放
+            iconContainer.localScale = baseScale;
+
+
             if (indicatorContainer != null && areaDisplay != null)
             {
-                float num = target?.IconScaleFactor ?? 1f;
-                indicatorContainer.localScale = Vector3.one * num / ParentLocalScale;
-                if (target != null && target.IsArea)
+                float num = target.IconScaleFactor;
                 {
                     areaDisplay.BorderWidth = areaLineThickness / ParentLocalScale;
                     areaDisplay.FalloffDistance = 1f / ParentLocalScale;

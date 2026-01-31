@@ -15,7 +15,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.UI.ProceduralImage;
 using ZoinkModdingLibrary.GameUI;
-using ZoinkModdingLibrary.Patcher;
+using ZoinkModdingLibrary.Logging;
+using ZoinkModdingLibrary.Utils;
 
 namespace MiniMap.Managers
 {
@@ -94,10 +95,10 @@ namespace MiniMap.Managers
         public static void HandlePointOfInterest(CharacterPoi poi, bool isOriginalMap)
         {
             PrefabPool<CharacterPoiEntry>? pool = isOriginalMap ? MapCharacterPoiEntryPool : MiniMapCharacterPoiEntryPool;
-            MiniMapDisplay? display = isOriginalMap ? CustomMinimapManager.OriginalMinimapDisplay : CustomMinimapManager.DuplicatedMinimapDisplay;
+            MiniMapDisplay? display = isOriginalMap ? MinimapManager.OriginalDisplay : MinimapManager.MinimapDisplay;
             if (pool == null || display == null)
             {
-                ModBehaviour.Logger.LogError($"CharacterPoiEntryPool:{pool?.ToString() ?? "null"}, MinimapDisplay: {display?.ToString() ?? "null"}");
+                Log.Error($"CharacterPoiEntryPool:{pool?.ToString() ?? "null"}, MinimapDisplay: {display?.ToString() ?? "null"}");
                 return;
             }
             //ModBehaviour.Logger.Log($"正在创建标记点: {poi.DisplayName}");
@@ -112,14 +113,14 @@ namespace MiniMap.Managers
                 PrefabPool<MiniMapDisplayEntry>? mapEntryPool = display.GetProperty<PrefabPool<MiniMapDisplayEntry>>("MapEntryPool");
                 if (mapEntryPool == null)
                 {
-                    ModBehaviour.Logger.LogError("MapEntryPool 为空");
+                    Log.Error("MapEntryPool 为空");
                     return;
                 }
 
                 MiniMapDisplayEntry miniMapDisplayEntry = mapEntryPool.ActiveEntries.FirstOrDefault(e => e.SceneReference != null && e.SceneReference.BuildIndex == targetSceneIndex);
                 if (miniMapDisplayEntry == null || miniMapDisplayEntry.Hide)
                 {
-                    ModBehaviour.Logger.LogError($"MiniMapDisplayEntry: {miniMapDisplayEntry?.ToString() ?? "null"}, Hide: {miniMapDisplayEntry?.Hide}");
+                    Log.Error($"MiniMapDisplayEntry: {miniMapDisplayEntry?.ToString() ?? "null"}, Hide: {miniMapDisplayEntry?.Hide}");
                     return;
                 }
                 pool.Get(display.transform).Setup(display, poi);
@@ -161,13 +162,13 @@ namespace MiniMap.Managers
 
         public static void OnEnable()
         {
-            CustomMinimapManager.MiniMapApplied += OnMiniMapApplied;
+            MinimapManager.MiniMapApplied += OnMiniMapApplied;
         }
 
         public static void OnDisable()
         {
             GameObject.Destroy(characterPoiEntryPrefabObj);
-            CustomMinimapManager.MiniMapApplied -= OnMiniMapApplied;
+            MinimapManager.MiniMapApplied -= OnMiniMapApplied;
         }
 
         private static void OnMiniMapApplied()
@@ -180,7 +181,7 @@ namespace MiniMap.Managers
 
         private static void CreatePrefab()
         {
-            if (CustomMinimapManager.Canvas == null)
+            if (MinimapManager.Canvas == null)
             {
                 return;
             }
@@ -188,7 +189,7 @@ namespace MiniMap.Managers
 
             GameObject prefabObj = new("CharacterPoiEntry");
             RectTransform prefabRect = prefabObj.AddComponent<RectTransform>();
-            prefabRect.SetParent(CustomMinimapManager.Canvas.transform);
+            prefabRect.SetParent(MinimapManager.Canvas.transform);
             prefabRect.localScale = Vector3.one;
             prefabRect.sizeDelta = new Vector2(100f, 100f);
             prefabRect.localPosition = Vector3.zero;

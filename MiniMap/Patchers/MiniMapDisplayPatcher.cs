@@ -10,7 +10,10 @@ using UnityEngine;
 using UnityEngine.Experimental.Rendering;
 using UnityEngine.UI;
 using ZoinkModdingLibrary.Attributes;
+using ZoinkModdingLibrary.Logging;
+using ZoinkModdingLibrary.ModSettings;
 using ZoinkModdingLibrary.Patcher;
+using ZoinkModdingLibrary.Utils;
 
 namespace MiniMap.Patchers
 {
@@ -27,7 +30,7 @@ namespace MiniMap.Patchers
             if (poi == null) return false;
             if (poi is CharacterPoi characterPoi)
             {
-                CharacterPoiManager.HandlePointOfInterest(characterPoi, __instance == CustomMinimapManager.OriginalMinimapDisplay);
+                CharacterPoiManager.HandlePointOfInterest(characterPoi, __instance == MinimapManager.MinimapDisplay);
                 return false;
             }
             return true;
@@ -39,7 +42,7 @@ namespace MiniMap.Patchers
             if (poi == null) return false;
             if (poi is CharacterPoi characterPoi)
             {
-                CharacterPoiManager.ReleasePointOfInterest(characterPoi, __instance == CustomMinimapManager.OriginalMinimapDisplay);
+                CharacterPoiManager.ReleasePointOfInterest(characterPoi, __instance == MinimapManager.MinimapDisplay);
                 return false;
             }
             return true;
@@ -48,7 +51,7 @@ namespace MiniMap.Patchers
         [MethodPatcher("HandlePointsOfInterests", PatchType.Postfix, BindingFlags.Instance | BindingFlags.NonPublic)]
         public static void HandlePointsOfInterestsPrefix(MiniMapDisplay __instance)
         {
-            CharacterPoiManager.HandlePointsOfInterests(__instance == CustomMinimapManager.OriginalMinimapDisplay);
+            CharacterPoiManager.HandlePointsOfInterests(__instance == MinimapManager.MinimapDisplay);
         }
 
         [MethodPatcher("SetupRotation", PatchType.Prefix, BindingFlags.Instance | BindingFlags.NonPublic)]
@@ -56,13 +59,13 @@ namespace MiniMap.Patchers
         {
             try
             {
-                float rotationAngle = ModSettingManager.GetValue<bool>("mapRotation") ? MiniMapCommon.GetMinimapRotation() : MiniMapCommon.originMapZRotation;
+                float rotationAngle = ModSettingManager.GetValue<bool>(ModBehaviour.ModInfo, "mapRotation") ? MiniMapCommon.GetMinimapRotation() : MiniMapCommon.originMapZRotation;
                 __instance.transform.rotation = Quaternion.Euler(0f, 0f, rotationAngle);
                 return false;
             }
             catch (Exception e)
             {
-                ModBehaviour.Logger.LogError($"设置小地图旋转时出错：" + e.ToString());
+                Log.Error($"设置小地图旋转时出错：" + e.ToString());
                 return true;
             }
         }
@@ -70,15 +73,15 @@ namespace MiniMap.Patchers
         [MethodPatcher("RegisterEvents", PatchType.Postfix, BindingFlags.Instance | BindingFlags.NonPublic)]
         public static void RegisterEventsPostfix(MiniMapDisplay __instance)
         {
-            AssemblyOption.BindStaticEvent(typeof(CharacterPoiManager), nameof(CharacterPoiManager.PoiRegistered), __instance, "HandlePointOfInterest");
-            AssemblyOption.BindStaticEvent(typeof(CharacterPoiManager), nameof(CharacterPoiManager.PoiUnregistered), __instance, "ReleasePointOfInterest");
+            typeof(CharacterPoiManager).BindEvent(nameof(CharacterPoiManager.PoiRegistered), __instance, "HandlePointOfInterest");
+            typeof(CharacterPoiManager).BindEvent(nameof(CharacterPoiManager.PoiUnregistered), __instance, "ReleasePointOfInterest");
         }
 
         [MethodPatcher("UnregisterEvents", PatchType.Postfix, BindingFlags.Instance | BindingFlags.NonPublic)]
         public static void UnregisterEventsPostfix(MiniMapDisplay __instance)
         {
-            AssemblyOption.UnbindStaticEvent(typeof(CharacterPoiManager), nameof(CharacterPoiManager.PoiRegistered), __instance, "HandlePointOfInterest");
-            AssemblyOption.UnbindStaticEvent(typeof(CharacterPoiManager), nameof(CharacterPoiManager.PoiUnregistered), __instance, "ReleasePointOfInterest");
+            typeof(CharacterPoiManager).UnbindEvent(nameof(CharacterPoiManager.PoiRegistered), __instance, "HandlePointOfInterest");
+            typeof(CharacterPoiManager).UnbindEvent(nameof(CharacterPoiManager.PoiUnregistered), __instance, "ReleasePointOfInterest");
         }
     }
 }

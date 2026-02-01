@@ -24,13 +24,18 @@ namespace MiniMap.Patchers
 
         private MiniMapDisplayPatcher() { }
 
+        private static bool IsOriginalDisplay(MiniMapDisplay display)
+        {
+            return display == MinimapManager.OriginalDisplay;
+        }
+
         [MethodPatcher("HandlePointOfInterest", PatchType.Prefix, BindingFlags.Instance | BindingFlags.NonPublic)]
         public static bool HandlePointOfInterestPrefix(MiniMapDisplay __instance, MonoBehaviour poi)
         {
             if (poi == null) return false;
             if (poi is CharacterPoi characterPoi)
             {
-                CharacterPoiManager.HandlePointOfInterest(characterPoi, __instance == MinimapManager.MinimapDisplay);
+                CharacterPoiManager.HandlePointOfInterest(characterPoi, IsOriginalDisplay(__instance));
                 return false;
             }
             return true;
@@ -42,7 +47,7 @@ namespace MiniMap.Patchers
             if (poi == null) return false;
             if (poi is CharacterPoi characterPoi)
             {
-                CharacterPoiManager.ReleasePointOfInterest(characterPoi, __instance == MinimapManager.MinimapDisplay);
+                CharacterPoiManager.ReleasePointOfInterest(characterPoi, IsOriginalDisplay(__instance));
                 return false;
             }
             return true;
@@ -51,7 +56,7 @@ namespace MiniMap.Patchers
         [MethodPatcher("HandlePointsOfInterests", PatchType.Postfix, BindingFlags.Instance | BindingFlags.NonPublic)]
         public static void HandlePointsOfInterestsPrefix(MiniMapDisplay __instance)
         {
-            CharacterPoiManager.HandlePointsOfInterests(__instance == MinimapManager.MinimapDisplay);
+            CharacterPoiManager.HandlePointsOfInterests(IsOriginalDisplay(__instance));
         }
 
         [MethodPatcher("SetupRotation", PatchType.Prefix, BindingFlags.Instance | BindingFlags.NonPublic)]

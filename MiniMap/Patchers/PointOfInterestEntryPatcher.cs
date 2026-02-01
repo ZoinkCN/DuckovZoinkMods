@@ -22,28 +22,6 @@ namespace MiniMap.Patchers
         public static new PatcherBase Instance { get; } = new PointOfInterestEntryPatcher();
         private PointOfInterestEntryPatcher() { }
 
-        [MethodPatcher("UpdateScale", PatchType.Prefix, BindingFlags.Instance | BindingFlags.NonPublic)]
-        public static bool UpdateScalePrefix(
-            PointOfInterestEntry __instance,
-            MiniMapDisplay ___master,
-            IPointOfInterest ___pointOfInterest,
-            Transform ___iconContainer,
-            ProceduralImage ___areaDisplay,
-            float ___areaLineThickness
-        )
-        {
-            try
-            {
-
-                return false;
-            }
-            catch (Exception e)
-            {
-                Log.Error($"UpdateScalePrefix failed: {e.Message}");
-                return true;
-            }
-        }
-
         [MethodPatcher("Update", PatchType.Prefix, BindingFlags.Instance | BindingFlags.NonPublic)]
         public static bool UpdatePrefix(PointOfInterestEntry __instance, Image ___icon, MiniMapDisplay ___master, TextMeshProUGUI ___displayName)
         {

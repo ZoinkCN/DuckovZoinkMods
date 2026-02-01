@@ -120,7 +120,7 @@ namespace MiniMap.Managers
                 MiniMapDisplayEntry miniMapDisplayEntry = mapEntryPool.ActiveEntries.FirstOrDefault(e => e.SceneReference != null && e.SceneReference.BuildIndex == targetSceneIndex);
                 if (miniMapDisplayEntry == null || miniMapDisplayEntry.Hide)
                 {
-                    Log.Error($"MiniMapDisplayEntry: {miniMapDisplayEntry?.ToString() ?? "null"}, Hide: {miniMapDisplayEntry?.Hide}");
+                    Log.Debug($"MiniMapDisplayEntry: {miniMapDisplayEntry?.ToString() ?? "null"}, Hide: {miniMapDisplayEntry?.Hide}");
                     return;
                 }
                 pool.Get(display.transform).Setup(display, poi);

@@ -22,10 +22,10 @@ namespace MiniMap.Poi
         //private MiniMapDisplayEntry? minimapEntry;
 
         [SerializeField]
-        private Transform? indicatorContainer;
+        private Transform? iconContainer;
 
         [SerializeField]
-        private Transform? iconContainer;
+        private Transform? iconImageContainer;
 
         [SerializeField]
         private Sprite? defaultIcon;
@@ -70,8 +70,8 @@ namespace MiniMap.Poi
         {
             areaDisplay = entryData.areaDisplay;
             areaFill = entryData.areaFill;
-            indicatorContainer = entryData.indicatorContainer;
-            iconContainer = entryData.iconContainer;
+            iconContainer = entryData.indicatorContainer;
+            iconImageContainer = entryData.iconContainer;
             icon = entryData.icon;
             shadow = entryData.shadow;
             direction = entryData.direction;
@@ -95,7 +95,7 @@ namespace MiniMap.Poi
             {
                 if (displayNameRect != null)
                 {
-                    iconContainer?.gameObject.SetActive(false);
+                    iconImageContainer?.gameObject.SetActive(false);
                     displayNameRect.pivot = new Vector2(0.5f, 0.5f);
                     displayNameRect.anchorMin = new Vector2(0.5f, 0.5f);
                     displayNameRect.anchorMax = new Vector2(0.5f, 0.5f);
@@ -106,7 +106,7 @@ namespace MiniMap.Poi
             {
                 if (displayNameRect != null)
                 {
-                    iconContainer?.gameObject.SetActive(true);
+                    iconImageContainer?.gameObject.SetActive(true);
                     displayNameRect.pivot = new Vector2(0.5f, 1f);
                     displayNameRect.anchorMin = new Vector2(0.5f, 0f);
                     displayNameRect.anchorMax = new Vector2(0.5f, 0f);
@@ -250,12 +250,10 @@ namespace MiniMap.Poi
             int iconScaleType = ModSettingManager.GetValue(ModBehaviour.ModInfo, "iconScaleType", 0);
             var baseScale = Vector3.one * d / ParentLocalScale;
 
-            // 应用缩放
-            iconContainer.localScale = baseScale;
-
-
-            if (indicatorContainer != null && areaDisplay != null)
+            if (iconContainer != null && areaDisplay != null)
             {
+                // 应用缩放
+                iconContainer.localScale = baseScale;
                 float num = target.IconScaleFactor;
                 {
                     areaDisplay.BorderWidth = areaLineThickness / ParentLocalScale;

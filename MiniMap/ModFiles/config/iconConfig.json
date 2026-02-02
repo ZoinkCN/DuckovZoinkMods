@@ -1,7 +1,7 @@
 {
     "friendly": {
         "defaultIcon": "MiniMap_FriendlyIcon.png",
-        "scale": 0.6,
+        "scale": 0.55,
         "PetPreset_NormalPet": "MiniMap_PetIcon.png",
         "EnemyPreset_QuestGiver_Fo": "",
         "EnemyPreset_QuestGiver_XiaoMing": "",
@@ -11,11 +11,11 @@
     },
     "enemy": {
         "defaultIcon": "MiniMap_EnemyIcon.png",
-        "scale": 0.6
+        "scale": 0.55
     },
     "neutral": {
         "defaultIcon": "MiniMap_NeutralIcon.png",
-        "scale": 0.6,
+        "scale": 0.55,
         "EnemyPreset_Spider_RotateShoot": "",
         "EnemyPreset_Melee_UltraMan": "",
         "EnemyPreset_Merchant_Myst": "",
@@ -24,7 +24,7 @@
     },
     "boss": {
         "defaultIcon": "MiniMap_BossIcon.png",
-        "scale": 0.9,
+        "scale": 0.8,
         "EnemyPreset_BossMelee_SchoolBully": "",
         "EnemyPreset_Boss_3Shot": "",
         "EnemyPreset_Boss_Arcade": "",

@@ -13,26 +13,27 @@ namespace ZoinkModdingLibrary.Utils
 {
     public static class AssemblyOperations
     {
-        internal static Assembly? GetCallerAssembly(out MethodBase? callerMethod)
+        internal static bool GetCallerAssembly(out Assembly? assembly, out StackFrame? callerFrame)
         {
             StackTrace stackTrace = new StackTrace(2);
             Assembly currentAssembly = Assembly.GetExecutingAssembly();
             foreach (StackFrame frame in stackTrace.GetFrames())
             {
                 MethodBase method = frame.GetMethod();
-                var assembly = method.DeclaringType.Assembly;
+                assembly = method.DeclaringType.Assembly;
 
                 if (assembly != null && assembly != currentAssembly &&
                     !assembly.FullName.StartsWith("System.") &&
                     !assembly.FullName.StartsWith("Microsoft.") &&
                     !assembly.FullName.StartsWith("mscorlib."))
                 {
-                    callerMethod = method;
-                    return assembly;
+                    callerFrame = frame;
+                    return true;
                 }
             }
-            callerMethod = null;
-            return null;
+            assembly = null;
+            callerFrame = null;
+            return false;
         }
 
         public static Type? FindTypeInAssemblies(string assembliyName, string typeName)

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -112,7 +113,8 @@ namespace ZoinkModdingLibrary.Logging
 
         private LogData GetLogData(string message, LogLevel logLevel)
         {
-            Assembly? assembly = AssemblyOperations.GetCallerAssembly(out _) ?? Assembly.GetExecutingAssembly();
+            AssemblyOperations.GetCallerAssembly(out Assembly? assembly, out _);
+            assembly ??= Assembly.GetExecutingAssembly();
             return new LogData(assembly.GetName().Name, Path.GetDirectoryName(assembly.Location), logLevel, message);
         }
 
@@ -152,71 +154,64 @@ namespace ZoinkModdingLibrary.Logging
             }
             catch (Exception ex)
             {
-                var errorLog = $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}][LogSystem][Error] 清理旧日志失败: {ex.Message}";
+                string errorLog = $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}][LogSystem][Error] 清理旧日志失败: {ex.Message}";
                 _logQueue.Enqueue(GetLogData(errorLog, LogLevel.Error));
             }
         }
 
         public void Log(object message, LogLevel level = LogLevel.Info)
         {
-            Assembly? callerAssembly = AssemblyOperations.GetCallerAssembly(out MethodBase? callerMethod);
-            string assemblyName = callerAssembly?.GetName().Name ?? "UnknownAssembly";
-            Type? callerType = callerMethod?.DeclaringType;
-            //UnityEngine.Debug.LogWarning($"Assembly: {assemblyName}, Level: {level}, Message: {message}");
+            if (!AssemblyOperations.GetCallerAssembly(out Assembly? callerAssembly, out StackFrame? callerFrame))
+            {
+                var errorLog = $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}][LogSystem][Error] 获取调用方失败";
+                _logQueue.Enqueue(GetLogData(errorLog, LogLevel.Error));
+                return;
+            }
+            string assemblyName = callerAssembly!.GetName().Name;
+            MethodBase callerMethod = callerFrame!.GetMethod();
+            Type callerType = callerMethod.DeclaringType;
 
-            LogAttribute? methodAttribute = callerMethod?.GetCustomAttribute<LogAttribute>();
-            LogAttribute? typeAttribute = callerType?.GetCustomAttribute<LogAttribute>();
-            LogAttribute? assemblyAttribute = callerAssembly?.GetCustomAttribute<LogAttribute>();
+            LogAttribute? methodAttribute = callerMethod.GetCustomAttribute<LogAttribute>();
+            LogAttribute? typeAttribute = callerType.GetCustomAttribute<LogAttribute>();
+            LogAttribute? assemblyAttribute = callerAssembly.GetCustomAttribute<LogAttribute>();
 
             LogLevel consoleLevel = methodAttribute?.ConsoleLevel ?? LogLevel.Unset;
-            //UnityEngine.Debug.LogWarning($"MethodConsoleLevel: {consoleLevel}");
             if (consoleLevel == LogLevel.Unset)
             {
                 consoleLevel = typeAttribute?.ConsoleLevel ?? LogLevel.Unset;
-                //UnityEngine.Debug.LogWarning($"TypeConsoleLevel: {consoleLevel}");
                 if (consoleLevel == LogLevel.Unset)
                 {
                     consoleLevel = assemblyAttribute?.ConsoleLevel ?? LogLevel.Unset;
-                    //UnityEngine.Debug.LogWarning($"AssemblyConsoleLevel: {consoleLevel}");
                 }
             }
 
             LogLevel fileLevel = methodAttribute?.FileLevel ?? LogLevel.Unset;
-            //UnityEngine.Debug.LogWarning($"MethodFileLevel: {fileLevel}");
             if (fileLevel == LogLevel.Unset)
             {
                 fileLevel = typeAttribute?.FileLevel ?? LogLevel.Unset;
-                //UnityEngine.Debug.LogWarning($"TypeFileLevel: {fileLevel}");
                 if (fileLevel == LogLevel.Unset)
                 {
                     fileLevel = assemblyAttribute?.FileLevel ?? LogLevel.Unset;
-                    //UnityEngine.Debug.LogWarning($"AssemblyFileLevel: {fileLevel}");
                 }
             }
 
             LogOutput consoleOutput = methodAttribute?.ConsoleOutput ?? LogOutput.Unset;
-            //UnityEngine.Debug.LogWarning($"MethodConsoleOutput: {consoleOutput}");
             if (consoleOutput == LogOutput.Unset)
             {
                 consoleOutput = typeAttribute?.ConsoleOutput ?? LogOutput.Unset;
-                //UnityEngine.Debug.LogWarning($"TypeConsoleOutput: {consoleOutput}");
                 if (consoleOutput == LogOutput.Unset)
                 {
                     consoleOutput = assemblyAttribute?.ConsoleOutput ?? LogOutput.Unset;
-                    //UnityEngine.Debug.LogWarning($"AssemblyConsoleOutput: {consoleOutput}");
                 }
             }
 
             LogOutput fileOutput = methodAttribute?.FileOutput ?? LogOutput.Unset;
-            //UnityEngine.Debug.LogWarning($"MethodFileOutput: {fileOutput}");
             if (fileOutput == LogOutput.Unset)
             {
                 fileOutput = typeAttribute?.FileOutput ?? LogOutput.Unset;
-                //UnityEngine.Debug.LogWarning($"TypeFileOutput: {fileOutput}");
                 if (fileOutput == LogOutput.Unset)
                 {
                     fileOutput = assemblyAttribute?.FileOutput ?? LogOutput.Unset;
-                    //UnityEngine.Debug.LogWarning($"AssemblyFileOutput: {fileOutput}");
                 }
             }
 
@@ -225,8 +220,8 @@ namespace ZoinkModdingLibrary.Logging
             {
                 messageStr = DesensitizeLog(messageStr);
             }
-
-            string logContent = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} [{assemblyName}][{level}] {messageStr}";
+            string methodInfoString = level == LogLevel.Debug ? $" {callerFrame.GetFileName()}: {callerFrame.GetFileLineNumber()}({callerFrame.GetMethod().Name})" : "";
+            string logContent = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} [{assemblyName}][{level}]{methodInfoString} {messageStr}";
             if (consoleOutput == LogOutput.Output && level <= consoleLevel)
             {
                 switch (level)

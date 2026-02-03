@@ -68,12 +68,12 @@ namespace MiniMap.Patchers
 							
 							if (shouldShowName)
 							{
-								___displayName.transform.localScale = Vector3.one * (2.5f * 0.6f);
-								___iconContainer.localScale = baseScale / 2.5f;
+								___displayName.transform.localScale = Vector3.one / MiniMapCommon.SceneTextIcons * 0.6f;
+								___iconContainer.localScale = baseScale * MiniMapCommon.SceneTextIcons;
 							}
 							else
 							{
-								___iconContainer.localScale = baseScale / (2.5f * 0.8f);
+								___iconContainer.localScale = baseScale * MiniMapCommon.SceneTextIcons * 1.25f;
 							}
 							
 							if (__instance.Target.name == "PointOfInterest" || __instance.Target.name == "MapElement") //MapElement 撤离点   PointOfInterest 传送气泡
@@ -115,7 +115,7 @@ namespace MiniMap.Patchers
 								___displayName.gameObject.SetActive(shouldShowName);
 								if (shouldShowName)
 								{
-									___displayName.transform.localScale = Vector3.one * MiniMapCommon.CascadeScalingUnits;
+									___displayName.transform.localScale = Vector3.one * characterPoi.NameScaleFactor * 1.25f;
 								}
 							}
 							
@@ -152,14 +152,14 @@ namespace MiniMap.Patchers
 							if (isCenterIcon)
 							{
 								___displayName.gameObject.SetActive(true);
-								___iconContainer.localScale = baseScale * MiniMapCommon.CascadeScalingUnits / MiniMapCommon.CenterIconSize; // 图标缩放（中心图标放大2.5倍）
+								___iconContainer.localScale = baseScale / MiniMapCommon.CenterIconSize; // 图标缩放（中心图标放大2.5倍）
 								___displayName.transform.localScale = Vector3.one;
 							}
 							else
 							{
 								___displayName.gameObject.SetActive(true);
 								___iconContainer.localScale = baseScale;
-								___displayName.transform.localScale = Vector3.one * (MiniMapCommon.CascadeScalingUnits * 0.8f);
+								___displayName.transform.localScale = Vector3.one * characterPoi.NameScaleFactor;
 							}
 						}
 					}

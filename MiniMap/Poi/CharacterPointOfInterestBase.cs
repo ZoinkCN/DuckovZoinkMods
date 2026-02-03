@@ -32,6 +32,14 @@ namespace MiniMap.Poi
         private float scaleFactor = 1f;
         private bool hideIcon = false;
         private string? overrideSceneID;
+		
+		// 添加名字缩放属性
+		private float nameScaleFactor = 1.0f;
+		public virtual float NameScaleFactor 
+		{ 
+			get => nameScaleFactor; 
+			set => nameScaleFactor = value; 
+		}
 
         public virtual bool Initialized => initialized;
         public virtual CharacterMainControl? Character => character;

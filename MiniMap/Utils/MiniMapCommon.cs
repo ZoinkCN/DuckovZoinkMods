@@ -10,17 +10,16 @@ namespace MiniMap.Utils
         public const float originMapZRotation = -30f;
         
         // 从配置读取的值
-        private static float _cascadeScalingUnits = 2.5f;
-        private static float _centerIconSize = 1.3f;
+        private static float _sceneTextIcons = 0.4f;
+        private static float _centerIconSize = 0.55f;
         
         // 属性提供对外访问，带默认值
-        public static float CascadeScalingUnits 
+        public static float SceneTextIcons 
         { 
             get 
             {
-                if (!_configLoaded)
-                    LoadConfig();
-                return _cascadeScalingUnits;
+                if (!_configLoaded) LoadConfig();
+                return _sceneTextIcons;
             }
         }
         
@@ -28,8 +27,7 @@ namespace MiniMap.Utils
         { 
             get 
             {
-                if (!_configLoaded)
-                    LoadConfig();
+                if (!_configLoaded) LoadConfig();
                 return _centerIconSize;
             }
         }
@@ -44,21 +42,21 @@ namespace MiniMap.Utils
                 JObject? config = ModFileOperations.LoadConfig(ModBehaviour.ModInfo, "iconConfig.json");
                 if (config != null)
                 {
-                    // 读取级联缩放单位
-                    if (config.TryGetValue("cascadeScalingUnits", out JToken? cascadeToken))
+                    // 读取 场景片区名字、传送气泡、撤离点图标 缩放比例
+                    if (config.TryGetValue("SceneTextIcons", out JToken? cascadeToken))
                     {
-                        _cascadeScalingUnits = cascadeToken.Value<float>();
+                        _sceneTextIcons = cascadeToken.Value<float>();
                     }
                     
                     // 读取中心图标大小
-                    if (config.TryGetValue("centerIconSize", out JToken? centerToken))
+                    if (config.TryGetValue("CenterIconSize", out JToken? centerToken))
                     {
                         _centerIconSize = centerToken.Value<float>();
                     }
                 }
                 _configLoaded = true;
                 
-                Log.Info($"从配置加载: CascadeScalingUnits={_cascadeScalingUnits}, CenterIconSize={_centerIconSize}");
+                Log.Info($"从配置加载: SceneTextIcons={_sceneTextIcons}, CenterIconSize={_centerIconSize}");
             }
             catch (System.Exception e)
             {

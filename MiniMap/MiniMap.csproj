@@ -23,8 +23,7 @@
 
   <ItemGroup>
     <!-- Harmony DLL -->
-    <Reference Include="0Harmony">
-      <HintPath>libs\0Harmony.dll</HintPath>
+    <Reference Include="$(WorkShopPath)\3589088839\0Harmony.dll">
       <Private>False</Private>
     </Reference>
 
@@ -41,6 +40,12 @@
     <!-- 资源文件 -->
     <ModFiles Include="ModFiles\**\*" />
   </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Lib.Harmony.Ref" Version="2.4.1" />
+    <PackageReference Include="System.Reflection.Emit" Version="4.7.0" />
+  </ItemGroup>
+  
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <!-- 获取 ZoinkModdingLibrary 的引用路径 -->
     <ItemGroup>
